@@ -217,14 +217,14 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("INR     A");
         break;
     case 0x3D:
-        printf();
+        printf("DCR     A");
         break;
     case 0x3E:
         printf("MVI     A, #$%02x", code[1]);
         opBytes = 2;
         break;
     case 0x3F:
-        printf();
+        printf("CMC");
         break;
     case 0x40:
         printf();
