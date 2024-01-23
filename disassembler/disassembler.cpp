@@ -10,9 +10,14 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
 {
     unsigned char *code = &codebuffer[pc];
     int opbytes = 1;
+    
+
     printf("%04x ", pc);
     switch (*code)
     {
+    // case structure:
+    // print statements should output the opcode and the following Data associated
+    // assign the  opbytes as well
     case 0x00:
         printf("NOP");
         break;
