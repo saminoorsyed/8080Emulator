@@ -1,8 +1,0 @@
-# Compiler on Ubuntu
-
-- for C lang, use Gcc
-`sudo apt install c++`
-- for C++ use G++
-`sudo apt install g++`
-
-
