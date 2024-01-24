@@ -38,7 +38,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR    B");
         break;
     case 0x06:
-        printf("MVI    B, #$%02x", code[1]);
+        printf("MVI    B, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x07:
@@ -63,7 +63,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     C");
         break;
     case 0x0E:
-        printf("MVI     C, #$%02x", code[1]);
+        printf("MVI     C, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x0F:
@@ -89,7 +89,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     D");
         break;
     case 0x16:
-        printf("MVI     D, #$%02x", code[1]);
+        printf("MVI     D, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x17:
@@ -114,7 +114,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     E");
         break;
     case 0x1E:
-        printf("MVI     E, #$%02x", code[1]);
+        printf("MVI     E, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x1F:
@@ -141,7 +141,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     H");
         break;
     case 0x26:
-        printf("MVI     H, #$%02x", code[1]);
+        printf("MVI     H, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x27:
@@ -167,7 +167,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     L");
         break;
     case 0x2E:
-        printf("MVI     L, #$%02x", code[1]);
+        printf("MVI     L, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x2F:
@@ -194,7 +194,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     M");
         break;
     case 0x36:
-        printf("MVI     M, #$%02x", code[1]);
+        printf("MVI     M, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x37:
@@ -220,7 +220,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DCR     A");
         break;
     case 0x3E:
-        printf("MVI     A, #$%02x", code[1]);
+        printf("MVI     A, #0x%02x", code[1]);
         opBytes = 2;
         break;
     case 0x3F:
@@ -611,34 +611,35 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("CMP     A");
         break;
     case 0xC0:
-        printf();
+        printf("RNZ");
         break;
     case 0xC1:
-        printf();
+        printf("POP     B");
         break;
     case 0xC2:
         printf();
         break;
     case 0xC3:
-        printf();
+        printf("JMP    $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xC4:
         printf();
         break;
     case 0xC5:
-        printf();
+        printf("PUSH    B");
         break;
     case 0xC6:
         printf();
         break;
     case 0xC7:
-        printf();
+        printf("RST     0");
         break;
     case 0xC8:
-        printf();
+        printf("RZ");
         break;
     case 0xC9:
-        printf();
+        printf("RET");
         break;
     case 0xCA:
         printf();
@@ -656,13 +657,13 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf();
         break;
     case 0xCF:
-        printf();
+        printf("RST     1");
         break;
     case 0xD0:
-        printf();
+        printf("RNC");
         break;
     case 0xD1:
-        printf();
+        printf("POP     D");
         break;
     case 0xD2:
         printf();
@@ -674,19 +675,19 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf();
         break;
     case 0xD5:
-        printf();
+        printf("PUSH    D");
         break;
     case 0xD6:
         printf();
         break;
     case 0xD7:
-        printf();
+        printf("RST     2");
         break;
     case 0xD8:
-        printf();
+        printf("RC");
         break;
     case 0xD9:
-        printf();
+        printf("RET");
         break;
     case 0xDA:
         printf();
@@ -701,40 +702,40 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf();
         break;
     case 0xDE:
-        printf();
+        printf("RST     3");
         break;
     case 0xDF:
         printf();
         break;
     case 0xE0:
-        printf();
+        printf("RPO");
         break;
     case 0xE1:
-        printf();
+        printf("POP     H");
         break;
     case 0xE2:
         printf();
         break;
     case 0xE3:
-        printf();
+        printf("XTHL");
         break;
     case 0xE4:
         printf();
         break;
     case 0xE5:
-        printf();
+        printf("PUSH    H");
         break;
     case 0xE6:
         printf();
         break;
     case 0xE7:
-        printf();
+        printf("RST     4");
         break;
     case 0xE8:
-        printf();
+        printf("RPE");
         break;
     case 0xE9:
-        printf();
+        printf("PCHL");
         break;
     case 0xEA:
         printf();
@@ -752,13 +753,13 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf();
         break;
     case 0xEF:
-        printf();
+        printf("RST     5");
         break;
     case 0xF0:
-        printf();
+        printf("RP");
         break;
     case 0xF1:
-        printf();
+        printf("POP     PSW");
         break;
     case 0xF2:
         printf();
@@ -770,19 +771,19 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf();
         break;
     case 0xF5:
-        printf();
+        printf("PUSH    PSW");
         break;
     case 0xF6:
         printf();
         break;
     case 0xF7:
-        printf();
+        printf("RST     6");
         break;
     case 0xF8:
-        printf();
+        printf("RM");
         break;
     case 0xF9:
-        printf();
+        printf("SPHL");
         break;
     case 0xFA:
         printf();
@@ -800,14 +801,9 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf();
         break;
     case 0xFF:
-        printf();
+        printf("RST     7");
         break;
 
-    /* ........ */
-    case 0x3e:
-        printf("MVI    A, #0x%02x", code[1]);
-        opBytes = 2;
-        break;
     /* ........ */
     case 0xc3:
         printf("JMP    $%02x%02x", code[2], code[1]);
