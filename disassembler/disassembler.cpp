@@ -16,7 +16,11 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
     switch (*code)
     {
     // case structure:
-    // print statements should output the opcode and the following Data associated
+    // print statement formats:
+    //      instruction     register
+    //      instruction     register, register
+    //      instruction     type (data or addr), bytes
+    //      instruction      
     // assign the  opBytes if other than 1
     case 0x00:
         printf("NOP");
@@ -617,20 +621,23 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("POP     B");
         break;
     case 0xC2:
-        printf();
+        printf("JNZ     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xC3:
-        printf("JMP    $%02x%02x", code[2], code[1]);
+        printf("JMP     adr, $%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0xC4:
-        printf();
+        printf("CNZ     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xC5:
         printf("PUSH    B");
         break;
     case 0xC6:
-        printf();
+        printf("ADI     data, $%02x",code[1]);
+        opBytes = 2;
         break;
     case 0xC7:
         printf("RST     0");
@@ -642,19 +649,24 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("RET");
         break;
     case 0xCA:
-        printf();
+        printf("JZ     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xCB:
-        printf();
+        printf("JMP     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xCC:
-        printf();
+        printf("CZ      adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xCD:
-        printf();
+        printf("CALL    adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xCE:
-        printf();
+        printf("ACI     data, $%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xCF:
         printf("RST     1");
@@ -666,19 +678,23 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("POP     D");
         break;
     case 0xD2:
-        printf();
+        printf("JNC     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xD3:
-        printf();
+        printf("OUT     data, $%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xD4:
-        printf();
+        printf("CNC     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xD5:
         printf("PUSH    D");
         break;
     case 0xD6:
-        printf();
+        printf("SUI     data, $%02x%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xD7:
         printf("RST     2");
@@ -690,22 +706,27 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("RET");
         break;
     case 0xDA:
-        printf();
+        printf("JC      adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xDB:
-        printf();
+        printf("IN      data, $%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xDC:
-        printf();
+        printf("CC      adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xDD:
-        printf();
+        printf("CALL    adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xDE:
-        printf("RST     3");
+        printf("SBI     data, $%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xDF:
-        printf();
+        printf("RST     3");
         break;
     case 0xE0:
         printf("RPO");
@@ -714,19 +735,22 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("POP     H");
         break;
     case 0xE2:
-        printf();
+        printf("JPO     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xE3:
         printf("XTHL");
         break;
     case 0xE4:
-        printf();
+        printf("CPO     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xE5:
         printf("PUSH    H");
         break;
     case 0xE6:
-        printf();
+        printf("ANI     data,$%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xE7:
         printf("RST     4");
@@ -738,19 +762,23 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("PCHL");
         break;
     case 0xEA:
-        printf();
+        printf("JPE     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xEB:
-        printf();
+        printf("XCHG");
         break;
     case 0xEC:
-        printf();
+        printf("CPE     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xED:
-        printf();
+        printf("CALL    adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xEE:
-        printf();
+        printf("XRI     data,$%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xEF:
         printf("RST     5");
@@ -762,19 +790,22 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("POP     PSW");
         break;
     case 0xF2:
-        printf();
+        printf("JP      adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xF3:
-        printf();
+        printf("DI");
         break;
     case 0xF4:
-        printf();
+        printf("CP      adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xF5:
         printf("PUSH    PSW");
         break;
     case 0xF6:
-        printf();
+        printf("ORI    data,$%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xF7:
         printf("RST     6");
@@ -786,32 +817,28 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("SPHL");
         break;
     case 0xFA:
-        printf();
+        printf("JM      adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xFB:
-        printf();
+        printf("EI");
         break;
     case 0xFC:
-        printf();
+        printf("CM     adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xFD:
-        printf();
+        printf("CALL    adr, $%02x%02x", code[2], code[1]);
+        opBytes = 3;
         break;
     case 0xFE:
-        printf();
+        printf("CPI     data,$%02x", code[1]);
+        opBytes = 2;
         break;
     case 0xFF:
         printf("RST     7");
         break;
-
-    /* ........ */
-    case 0xc3:
-        printf("JMP    $%02x%02x", code[2], code[1]);
-        opBytes = 3;
-        break;
-        /* ........ */
     }
-
     printf("\n");
 
     return opBytes;
