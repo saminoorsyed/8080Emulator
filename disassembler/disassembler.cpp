@@ -227,388 +227,388 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("CMC");
         break;
     case 0x40:
-        printf();
+        printf("MOV     B,B");
         break;
     case 0x41:
-        printf();
+        printf("MOV     B,C");
         break;
     case 0x42:
-        printf();
+        printf("MOV     B,F");
         break;
     case 0x43:
-        printf();
+        printf("MOV     B,E");
         break;
     case 0x44:
-        printf();
+        printf("MOV     B,H");
         break;
     case 0x45:
-        printf();
+        printf("MOV     B,L");
         break;
     case 0x46:
-        printf();
+        printf("MOV     B,M");
         break;
     case 0x47:
-        printf();
+        printf("MOV     B,A");
         break;
     case 0x48:
-        printf();
+        printf("MOV     C,B");
         break;
     case 0x49:
-        printf();
+        printf("MOV     C,C");
         break;
     case 0x4A:
-        printf();
+        printf("MOV     C,D");
         break;
     case 0x4B:
-        printf();
+        printf("MOV     C,E");
         break;
     case 0x4C:
-        printf();
+        printf("MOV     C,H");
         break;
     case 0x4D:
-        printf();
+        printf("MOV     C,L");
         break;
     case 0x4E:
-        printf();
+        printf("MOV     C,M");
         break;
     case 0x4F:
-        printf();
+        printf("MOV     C,A");
         break;
     case 0x50:
-        printf();
+        printf("MOV     D,B");
         break;
     case 0x51:
-        printf();
+        printf("MOV     D,C");
         break;
     case 0x52:
-        printf();
+        printf("MOV     D,D");
         break;
     case 0x53:
-        printf();
+        printf("MOV     D,E");
         break;
     case 0x54:
-        printf();
+        printf("MOV     D,H");
         break;
     case 0x55:
-        printf();
+        printf("MOV     D,L");
         break;
     case 0x56:
-        printf();
+        printf("MOV     D,M");
         break;
     case 0x57:
-        printf();
+        printf("MOV     D,A");
         break;
     case 0x58:
-        printf();
+        printf("MOV     E,B");
         break;
     case 0x59:
-        printf();
+        printf("MOV     E,C");
         break;
     case 0x5A:
-        printf();
+        printf("MOV     E,D");
         break;
     case 0x5B:
-        printf();
+        printf("MOV     E,E");
         break;
     case 0x5C:
-        printf();
+        printf("MOV     E,H");
         break;
     case 0x5D:
-        printf();
+        printf("MOV     E,L");
         break;
     case 0x5E:
-        printf();
+        printf("MOV     E,M");
         break;
     case 0x5F:
-        printf();
+        printf("MOV     E,A");
         break;
     case 0x60:
-        printf();
+        printf("MOV     H,B");
         break;
     case 0x61:
-        printf();
+        printf("MOV     H,C");
         break;
     case 0x62:
-        printf();
+        printf("MOV     H,D");
         break;
     case 0x63:
-        printf();
+        printf("MOV     H,E");
         break;
     case 0x64:
-        printf();
+        printf("MOV     H,H");
         break;
     case 0x65:
-        printf();
+        printf("MOV     H,L");
         break;
     case 0x66:
-        printf();
+        printf("MOV     H,M");
         break;
     case 0x67:
-        printf();
+        printf("MOV     H,A");
         break;
     case 0x68:
-        printf();
+        printf("MOV     L,B");
         break;
     case 0x69:
-        printf();
+        printf("MOV     L,C");
         break;
     case 0x6A:
-        printf();
+        printf("MOV     L,D");
         break;
     case 0x6B:
-        printf();
+        printf("MOV     L,E");
         break;
     case 0x6C:
-        printf();
+        printf("MOV     L,H");
         break;
     case 0x6D:
-        printf();
+        printf("MOV     L,L");
         break;
     case 0x6E:
-        printf();
+        printf("MOV     L,M");
         break;
     case 0x6F:
-        printf();
+        printf("MOV     L,A");
         break;
     case 0x70:
-        printf();
+        printf("MOV     M,B");
         break;
     case 0x71:
-        printf();
+        printf("MOV     M,C");
         break;
     case 0x72:
-        printf();
+        printf("MOV     M,D");
         break;
     case 0x73:
-        printf();
+        printf("MOV     M,E");
         break;
     case 0x74:
-        printf();
+        printf("MOV     M,H");
         break;
     case 0x75:
-        printf();
+        printf("MOV     M,L");
         break;
     case 0x76:
-        printf();
+        printf("HLT");
         break;
     case 0x77:
-        printf();
+        printf("MOV     M,A");
         break;
     case 0x78:
-        printf();
+        printf("MOV     A,B");
         break;
     case 0x79:
-        printf();
+        printf("MOV     A,C");
         break;
     case 0x7A:
-        printf();
+        printf("MOV     A,D");
         break;
     case 0x7B:
-        printf();
+        printf("MOV     A,E");
         break;
     case 0x7C:
-        printf();
+        printf("MOV     A,H");
         break;
     case 0x7D:
-        printf();
+        printf("MOV     A,L");
         break;
     case 0x7E:
-        printf();
+        printf("MOV     A,M");
         break;
     case 0x7F:
-        printf();
+        printf("MOV     A,A");
         break;
     case 0x80:
-        printf();
+        printf("ADD     B");
         break;
     case 0x81:
-        printf();
+        printf("ADD     C");
         break;
     case 0x82:
-        printf();
+        printf("ADD     D");
         break;
     case 0x83:
-        printf();
+        printf("ADD     E");
         break;
     case 0x84:
-        printf();
+        printf("ADD     H");
         break;
     case 0x85:
-        printf();
+        printf("ADD     L");
         break;
     case 0x86:
-        printf();
+        printf("ADD     M");
         break;
     case 0x87:
-        printf();
+        printf("ADD     A");
         break;
     case 0x88:
-        printf();
+        printf("ADC     B");
         break;
     case 0x89:
-        printf();
+        printf("ADC     C");
         break;
     case 0x8A:
-        printf();
+        printf("ADC     D");
         break;
     case 0x8B:
-        printf();
+        printf("ADC     E");
         break;
     case 0x8C:
-        printf();
+        printf("ADC     H");
         break;
     case 0x8D:
-        printf();
+        printf("ADC     L");
         break;
     case 0x8E:
-        printf();
+        printf("ADC     M");
         break;
     case 0x8F:
-        printf();
+        printf("ADC     A");
         break;
     case 0x90:
-        printf();
+        printf("SUB     B");
         break;
     case 0x91:
-        printf();
+        printf("SUB     C");
         break;
     case 0x92:
-        printf();
+        printf("SUB     D");
         break;
     case 0x93:
-        printf();
+        printf("SUB     E");
         break;
     case 0x94:
-        printf();
+        printf("SUB     H");
         break;
     case 0x95:
-        printf();
+        printf("SUB     L");
         break;
     case 0x96:
-        printf();
+        printf("SUB     M");
         break;
     case 0x97:
-        printf();
+        printf("SUB     A");
         break;
     case 0x98:
-        printf();
+        printf("SBB     B");
         break;
     case 0x99:
-        printf();
+        printf("SBB     C");
         break;
     case 0x9A:
-        printf();
+        printf("SBB     D");
         break;
     case 0x9B:
-        printf();
+        printf("SBB     E");
         break;
     case 0x9C:
-        printf();
+        printf("SBB     H");
         break;
     case 0x9D:
-        printf();
+        printf("SBB     L");
         break;
     case 0x9E:
-        printf();
+        printf("SBB     M");
         break;
     case 0x9F:
-        printf();
+        printf("SBB     A");
         break;
     case 0xA0:
-        printf();
+        printf("ANA     B");
         break;
     case 0xA1:
-        printf();
+        printf("ANA     C");
         break;
     case 0xA2:
-        printf();
+        printf("ANA     D");
         break;
     case 0xA3:
-        printf();
+        printf("ANA     E");
         break;
     case 0xA4:
-        printf();
+        printf("ANA     H");
         break;
     case 0xA5:
-        printf();
+        printf("ANA     L");
         break;
     case 0xA6:
-        printf();
+        printf("ANA     M");
         break;
     case 0xA7:
-        printf();
+        printf("ANA     A");
         break;
     case 0xA8:
-        printf();
+        printf("XRA     B");
         break;
     case 0xA9:
-        printf();
+        printf("XRA     C");
         break;
     case 0xAA:
-        printf();
+        printf("XRA     D");
         break;
     case 0xAB:
-        printf();
+        printf("XRA     E");
         break;
     case 0xAC:
-        printf();
+        printf("XRA     H");
         break;
     case 0xAD:
-        printf();
+        printf("XRA     L");
         break;
     case 0xAE:
-        printf();
+        printf("XRA     M");
         break;
     case 0xAF:
-        printf();
+        printf("XRA     A");
         break;
     case 0xB0:
-        printf();
+        printf("ORA     B");
         break;
     case 0xB1:
-        printf();
+        printf("ORA     C");
         break;
     case 0xB2:
-        printf();
+        printf("ORA     D");
         break;
     case 0xB3:
-        printf();
+        printf("ORA     E");
         break;
     case 0xB4:
-        printf();
+        printf("ORA     H");
         break;
     case 0xB5:
-        printf();
+        printf("ORA     L");
         break;
     case 0xB6:
-        printf();
+        printf("ORA     M");
         break;
     case 0xB7:
-        printf();
+        printf("ORA     A");
         break;
     case 0xB8:
-        printf();
+        printf("CMP     B");
         break;
     case 0xB9:
-        printf();
+        printf("CMP     C");
         break;
     case 0xBA:
-        printf();
+        printf("CMP     D");
         break;
     case 0xBB:
-        printf();
+        printf("CMP     E");
         break;
     case 0xBC:
-        printf();
+        printf("CMP     H");
         break;
     case 0xBD:
-        printf();
+        printf("CMP     L");
         break;
     case 0xBE:
-        printf();
+        printf("CMP     M");
         break;
     case 0xBF:
-        printf();
+        printf("CMP     A");
         break;
     case 0xC0:
         printf();
