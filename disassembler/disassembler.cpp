@@ -78,7 +78,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("NOP");
         break;
     case 0x11:
-        printf("LXI     D,      0x%02x%02x", code[1], code[2]);
+        printf("LXI     D,      0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x12:
@@ -129,11 +129,11 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("NOP");
         break;
     case 0x21:
-        printf("LXI     H,      0x%02x%02x", code[1], code[2]);
+        printf("LXI     H,      0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x22:
-        printf("SHLD    adr,    0x%02x%02x", code[1], code[2]);
+        printf("SHLD    adr,    0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x23:
@@ -159,7 +159,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DAD     H");
         break;
     case 0x2A:
-        printf("LHLD    adr,    0x%02x%02x", code[1], code[2]);
+        printf("LHLD    adr,    0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x2B:
@@ -182,11 +182,11 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("NOP");
         break;
     case 0x31:
-        printf("LXI     SP,     0x%02x%02x", code[1], code[2]);
+        printf("LXI     SP,     0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x32:
-        printf("STA     adr,    0x%02x%02x", code[1], code[2]);
+        printf("STA     adr,    0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x33:
@@ -212,7 +212,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("DAD     SP");
         break;
     case 0x3A:
-        printf("LDA     adr,    0x%02x%02x", code[1], code[2]);
+        printf("LDA     adr,    0x%02x%02x", code[2], code[1]);
         opBytes = 3;
         break;
     case 0x3B:
