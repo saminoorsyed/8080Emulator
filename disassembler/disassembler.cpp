@@ -852,7 +852,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
 int main(int argc, char**argv)
 {
     // Code for the main function
-    // Read the code into a buffer r = read b = binary
+    // Read the code into a buffer r = read, b = binary
     // Get a pointer to the beginning of the buffer
     FILE *f = fopen(argv[1], "rb");
     if (f==nullptr){
