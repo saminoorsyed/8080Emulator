@@ -1,5 +1,5 @@
 // Date: Jan 22, 2024
-// Purpose: DisasSembler for Space invaders
+// Purpose: Disassembler for Space Invaders
 
 #include <fstream>
 
@@ -846,7 +846,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
 }
 
 // argc = number of command line arguments
-// char**argv =  char *argv[] = a list of command lin arguments 
+// char**argv =  char *argv[] = a list of command line arguments
 // argv[0] = name of the program, argv[1] = first arg called after file name
 // call the function with the file you want to read
 int main(int argc, char**argv)
@@ -855,7 +855,7 @@ int main(int argc, char**argv)
     // Read the code into a buffer r = read b = binary
     // Get a pointer to the beginning of the buffer
     FILE *f = fopen(argv[1], "rb");
-    if (f==NULL){
+    if (f==nullptr){
         printf("error: Could not open %s\n", argv[1]);
         exit(1);
     }
@@ -866,11 +866,11 @@ int main(int argc, char**argv)
     fseek(f, 0L, SEEK_SET); //move the pointer back to the beginning
 
     // Use the byte at the pointer to determine the opcode
-    unsigned char *buffer = (unsigned char *)malloc(fSize);
+    auto *buffer = (unsigned char *)malloc(fSize);
     fread(buffer, fSize, 1,f);
     fclose(f);
 
-    // Print out the name of the opcode using the bytes after the opcode as data,
+    // Print out the name of the opcode using the bytes after the opcode as data
     int pc = 0;
     while (pc <fSize){
         // advance the pointer the length of the returned opcode
