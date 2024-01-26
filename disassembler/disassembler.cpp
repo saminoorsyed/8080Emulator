@@ -846,7 +846,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
 }
 
 // argc = number of command line arguments
-// char **argv =  char *argv[] = a list of command line arguments
+// char **argv =  char *argv[] = list of command line arguments
 // argv[0] = name of the program, argv[1] = first arg called after file name
 // call the function with the file you want to read
 int main(int argc, char**argv)
