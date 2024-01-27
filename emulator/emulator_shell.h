@@ -33,7 +33,7 @@ public:
         uint16_t pc;
         uint8_t *mem;
         uint8_t int_enable;
-        struct FlagCodes f;
+        FlagCodes f;
     } State8080;
 
     void UnimplementedInstruction(State8080 *state);
