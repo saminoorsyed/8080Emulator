@@ -2,8 +2,10 @@
 // Purpose: Disassembler for Space Invaders
 
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
+namespace FileSystem = std::filesystem;
 
 
 int Disassemble8080Op(unsigned char *codebuffer, int pc)
@@ -854,9 +856,13 @@ int main(int argc, char**argv)
     // Code for the main function
     // Read the code into a buffer r = read, b = binary
     // Get a pointer to the beginning of the buffer
-    FILE *f = fopen(argv[1], "rb");
-    if (f==nullptr){
-        printf("error: Could not open %s\n", argv[1]);
+    FILE *f;
+    FileSystem::path romPath = "../ROM/invaders";
+    string filepath = FileSystem::absolute(romPath).string();
+    const char* rawFilePath = filepath.c_str();
+    errno_t err = fopen_s(&f ,rawFilePath, "rb");
+    if (f==NULL){
+        printf("error: Could not open %s\n", rawFilePath);
         exit(1);
     }
     
