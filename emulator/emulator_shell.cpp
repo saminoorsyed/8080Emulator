@@ -5,6 +5,16 @@ using namespace std;
 
 CPU::CPU() {}
 
+// Return true if even parity and false if odd parity
+bool CPU::Parity(uint16_t number) {
+    bool parity = true;
+    while (number) {
+        parity = !parity;
+        number = number & (number - 1);
+    }
+    return parity;
+}
+
 // Placeholder function for currently unimplemented instructions
 // Lets us track where we are with getting instruction function up and working
 void CPU::UnimplementedInstruction(State8080 *state) {
@@ -14,90 +24,154 @@ void CPU::UnimplementedInstruction(State8080 *state) {
     exit(1);
 }
 
+CPU::FlagCodes CPU::SetFlags(uint16_t result) {
+    FlagCodes ResultCodes;
+    //check if zero flag should be set
+    ResultCodes.z = (result == 0);
+
+    // Sign flag - most significant bit is set
+    ResultCodes.s = 0x80 == (result & 0x80);
+
+    // Pariaty flag, check if the last bit is set
+    ResultCodes.p = Parity(result);
+
+    // Carry flag will be true if result > 255 (1111 1111)
+    ResultCodes.cy = (result > 0xff);
+
+    // Aux carry is not used in space invaders, pending implementation
+    ResultCodes.ac = 1;
+
+    return ResultCodes;
+}
+
 // Function for emulating 8080 opcodes, has case for each of our opcodes
 // Unimplemented instructions will call UnimplementedInstruction function
 int CPU::Emulate8080Codes(State8080 *state){
     unsigned char *opcode = &state->mem[state->pc];
+    uint32_t  result;
+
+    // Combined registers 
+    // needs to be calculated at usage time
+    uint16_t bc;
+    uint16_t hl;
+    uint16_t de;
 
     switch(*opcode){
         case 0x00:
-            CPU::UnimplementedInstruction(state);
-            break;
+            break; // NOP
 
         case 0x01:
-            CPU::UnimplementedInstruction(state);
+            state->b = opcode[2];
+            state->c = opcode[1];
+            state->pc += 2;
             break;
 
         case 0x02:
-            CPU::UnimplementedInstruction(state);
+            // to create bc shift bits left by 8, creating an empty 8 right bits.
+            // Add state->c to the right bits with bitwise or.
+            bc = (state->b << 8) | state->c;
+            state->mem[bc] = state->a;
             break;
 
         case 0x03:
-            CPU::UnimplementedInstruction(state);
+            bc = (state->b << 8) | state->c;
+            bc += 1;
+            state->b = bc >> 8; // delete the last 8 bits to get b alone
+            state->c = (bc - (state->b << 8)); // subtract the first 8 bits to get c alone
             break;
 
         case 0x04:
-            CPU::UnimplementedInstruction(state);
+            state->b += 1;
+            result = state->b;
+            state->f = SetFlags(result);
             break;
 
         case 0x05:
-            CPU::UnimplementedInstruction(state);
+            state->b -= 1;
+            result = state->b;
+            state->f = SetFlags(result);
             break;
 
         case 0x06:
-            CPU::UnimplementedInstruction(state);
+            state->b = opcode[1];
+            state->pc += 1;
             break;
 
         case 0x07:
-            CPU::UnimplementedInstruction(state);
+            result = 0x80 == (state->a & 0x80); // get most significant bit
+            state->a = state->a << 1;
+            state->f.cy = result;
             break;
 
         case 0x08:
-            CPU::UnimplementedInstruction(state);
-            break;
+            break; // NOP
 
         case 0x09:
-            CPU::UnimplementedInstruction(state);
+            bc = (state->b << 8) | state->c;
+            hl = (state->h << 8) | state->l;
+            result = bc + hl;
+            state->b = bc >> 8;
+            state->c = (bc - (state->b << 8));
+            state->h = hl >> 8;
+            state->l = (hl - (state->h << 8));
+            state->f = SetFlags(result);
             break;
 
         case 0x0A:
-            CPU::UnimplementedInstruction(state);
+            bc = (state->b << 8) | state->c;
+            state->a = state->mem[bc];
             break;
 
         case 0x0B:
-            CPU::UnimplementedInstruction(state);
+            bc = (state->b << 8) | state->c;
+            bc -= 1;
+            state->b = bc >> 8;
+            state->c = (bc - (state->b << 8));
             break;
 
         case 0x0C:
-            CPU::UnimplementedInstruction(state);
+            result = state->c + 1;
+            state->c = result;
+            state->f = SetFlags(result);
             break;
 
         case 0x0D:
-            CPU::UnimplementedInstruction(state);
+            result = state->c - 1;
+            state->c = result;
+            state->f = SetFlags(result);
             break;
 
         case 0x0E:
-            CPU::UnimplementedInstruction(state);
+            state->c = opcode[1];
+            state->pc += 1;
             break;
 
         case 0x0F:
-            CPU::UnimplementedInstruction(state);
+            // the least significant bit is always 1 for odd numbers
+            result = (state->a % 2 != 0);
+            state->a = state->a >> 1;
+            state->f.cy = result;
             break;
 
         case 0x10:
-            CPU::UnimplementedInstruction(state);
-            break;
+            break; // NOP
 
         case 0x11:
-            CPU::UnimplementedInstruction(state);
+            state->d = opcode[2];
+            state->e = opcode[1];
+            state->pc += 2;
             break;
 
         case 0x12:
-            CPU::UnimplementedInstruction(state);
+            de = (state->d << 8) | state->e;
+            state->mem[de] = state->a;
             break;
 
         case 0x13:
-            CPU::UnimplementedInstruction(state);
+            de = (state->d << 8) | state->e;
+            de += 1;
+            state->d = de >> 8;
+            state->e = (de - (state->d << 8));
             break;
 
         case 0x14:
@@ -1047,10 +1121,5 @@ int CPU::Emulate8080Codes(State8080 *state){
     (state->pc)++;
 
     //Potentially short term return, expect failed cases will return 1?
-    return 0;
-}
-
-
-int main(){
     return 0;
 }

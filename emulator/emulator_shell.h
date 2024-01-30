@@ -7,7 +7,7 @@ class CPU {
 public:
     CPU();
 
-    // Defines FlagCodes structure for tracking/adjusting flags in F register
+// Defines FlagCodes structure for tracking/adjusting flags in F register
 // pad variable for bits 5, 3, and 1 which retain set value (not used)
 // bit 5 always 0, bit 3 always 0, bit 1 always 1
     typedef struct FlagCodes {
@@ -39,5 +39,9 @@ public:
     void UnimplementedInstruction(State8080 *state);
 
     int Emulate8080Codes(State8080 *state);
+
+    FlagCodes SetFlags(uint16_t result);
+
+    bool Parity(uint16_t number);
 
 };
