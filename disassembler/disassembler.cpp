@@ -860,7 +860,11 @@ int main(int argc, char**argv)
     FileSystem::path romPath = "../ROM/invaders";
     string filepath = FileSystem::absolute(romPath).string();
     const char* rawFilePath = filepath.c_str();
-    errno_t err = fopen_s(&f ,rawFilePath, "rb");
+#ifdef _WIN32
+    errno_t err = fopen_s(&f, rawFilePath, "rb");
+#else
+    f = fopen(rawFilePath, "r");
+#endif
     if (f==NULL){
         printf("error: Could not open %s\n", rawFilePath);
         exit(1);
