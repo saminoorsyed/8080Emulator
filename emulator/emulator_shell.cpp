@@ -415,87 +415,91 @@ int CPU::Emulate8080Codes(State8080 *state){
             break;
 
         case 0x50:
-            CPU::UnimplementedInstruction(state);
+            state->d = state->b;
             break;
 
         case 0x51:
-            CPU::UnimplementedInstruction(state);
+            state->d = state->c;
             break;
 
         case 0x52:
-            CPU::UnimplementedInstruction(state);
+            // state->d = state->d; This operation does nothing MOV D, D
             break;
 
         case 0x53:
-            CPU::UnimplementedInstruction(state);
+            state->d = state->e;
             break;
 
         case 0x54:
-            CPU::UnimplementedInstruction(state);
+            state->d = state->h;
             break;
 
         case 0x55:
-            CPU::UnimplementedInstruction(state);
+            state->d = state->l;
             break;
 
         case 0x56:
-            CPU::UnimplementedInstruction(state);
+            // MOV D,M moves the number stored in the address at HL to register D
+            // shift H left by 8 bits and do an or operator with L
+            uint16_t hl = (state->h<<8)| (state->l);
+            state->d = state->mem[hl];
             break;
 
         case 0x57:
-            CPU::UnimplementedInstruction(state);
+            state->d = state->a;
             break;
 
         case 0x58:
-            CPU::UnimplementedInstruction(state);
+            state->e = state->b;
             break;
 
         case 0x59:
-            CPU::UnimplementedInstruction(state);
+            state->e = state->c;
             break;
 
         case 0x5A:
-            CPU::UnimplementedInstruction(state);
+            state->e = state->d;
             break;
 
         case 0x5B:
-            CPU::UnimplementedInstruction(state);
+            // state->e = state->e; this code does nothing
             break;
 
         case 0x5C:
-            CPU::UnimplementedInstruction(state);
+            state->e = state->h;
             break;
 
         case 0x5D:
-            CPU::UnimplementedInstruction(state);
+            state->e = state->l;
             break;
 
         case 0x5E:
-            CPU::UnimplementedInstruction(state);
+            uint16_t hl = (state->h<<8)|(state->l);
+            state->e = state->mem[hl];
             break;
 
         case 0x5F:
-            CPU::UnimplementedInstruction(state);
+            state->e = state->a;
             break;
 
         case 0x60:
-            CPU::UnimplementedInstruction(state);
+            state->h = state->b;
             break;
 
         case 0x61:
-            CPU::UnimplementedInstruction(state);
+            state->h = state->c;
             break;
 
         case 0x62:
-            CPU::UnimplementedInstruction(state);
+            state->h = state->d;
             break;
 
         case 0x63:
-            CPU::UnimplementedInstruction(state);
+            state->h = state->e;
             break;
 
         case 0x64:
-            CPU::UnimplementedInstruction(state);
+            state->h = state->h;
             break;
 
         case 0x65:
