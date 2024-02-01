@@ -32,7 +32,7 @@ CPU::FlagCodes CPU::SetFlags(uint16_t result) {
     // Sign flag - most significant bit is set
     ResultCodes.s = 0x80 == (result & 0x80);
 
-    // Pariaty flag, check if the last bit is set
+    // Parity flag, check if the last bit is set
     ResultCodes.p = Parity(result);
 
     // Carry flag will be true if result > 255 (1111 1111)
@@ -174,8 +174,13 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->e = (de - (state->d << 8));
             break;
 
-        case 0x14:
-            CPU::UnimplementedInstruction(state);
+        case 0x14: //INR D
+            state->d += 1;
+            result = state->d;
+            state->f.z = state->d == 0;
+            state->f.s = 0x80 == (state->d & 0x80);
+            state->f.p = Parity(state->d);
+            state->f.ac = 1;
             break;
 
         case 0x15:
@@ -206,8 +211,13 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0x1C:
-            CPU::UnimplementedInstruction(state);
+        case 0x1C: //INR E
+            state->e += 1;
+            result = state->e;
+            state->f.z = state->e == 0;
+            state->f.s = 0x80 == (state->e & 0x80);
+            state->f.p = Parity(state->e);
+            state->f.ac = 1;
             break;
 
         case 0x1D:
@@ -238,8 +248,13 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0x24:
-            CPU::UnimplementedInstruction(state);
+        case 0x24: //INR H
+            state->h += 1;
+            result = state->h;
+            state->f.z = state->h == 0;
+            state->f.s = 0x80 == (state->h & 0x80);
+            state->f.p = Parity(state->h);
+            state->f.ac = 1;
             break;
 
         case 0x25:
