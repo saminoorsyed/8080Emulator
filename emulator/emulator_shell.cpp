@@ -757,84 +757,214 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0x90:
-            CPU::UnimplementedInstruction(state);
+        case 0x90: //SUB B
+            result = state->a + (~state->b) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->b > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x91:
-            CPU::UnimplementedInstruction(state);
+        case 0x91: //SUB C
+            result = state->a + (~state->c) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->c > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x92:
-            CPU::UnimplementedInstruction(state);
+        case 0x92: //SUB D
+            result = state->a + (~state->d) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->d > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x93:
-            CPU::UnimplementedInstruction(state);
+        case 0x93: //SUB E
+            result = state->a + (~state->e) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->e > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x94:
-            CPU::UnimplementedInstruction(state);
+        case 0x94: //SUB H
+            result = state->a + (~state->h) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->h > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x95:
-            CPU::UnimplementedInstruction(state);
+        case 0x95: //SUB L
+            result = state->a + (~state->l) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->l > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x96:
-            CPU::UnimplementedInstruction(state);
+        case 0x96: //SUB M
+            hl = (state->h << 8) | state->l;
+            result = state->a + (~state->mem[hl]) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->mem[hl] > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x97:
-            CPU::UnimplementedInstruction(state);
+        case 0x97: //SUB A
+            result = state->a + (~state->a) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = 0;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x98:
-            CPU::UnimplementedInstruction(state);
+        case 0x98: //SBB B
+            result = state->a + (~state->b) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->b > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x99:
-            CPU::UnimplementedInstruction(state);
+        case 0x99: //SBB C
+            result = state->a + (~state->c) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->c > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x9A:
-            CPU::UnimplementedInstruction(state);
+        case 0x9A: //SBB D
+            result = state->a + (~state->d) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->d > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x9B:
-            CPU::UnimplementedInstruction(state);
+        case 0x9B: //SBB E
+            result = state->a + (~state->e) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->e > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x9C:
-            CPU::UnimplementedInstruction(state);
+        case 0x9C: //SBB H
+            result = state->a + (~state->h) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->h > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x9D:
-            CPU::UnimplementedInstruction(state);
+        case 0x9D: //SBB L
+            result = state->a + (~state->l) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->l > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x9E:
-            CPU::UnimplementedInstruction(state);
+        case 0x9E: //SBB M
+            hl = (state->h << 8) | state->l;
+            result = state->a + (~state->mem[hl]) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->mem[hl] > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0x9F:
-            CPU::UnimplementedInstruction(state);
+        case 0x9F: //SBB A
+            result = state->a + (~state->a) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = 0;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
             break;
 
-        case 0xA0:
-            CPU::UnimplementedInstruction(state);
+        case 0xA0: //ANA B
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->b & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->b;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
             break;
 
-        case 0xA1:
-            CPU::UnimplementedInstruction(state);
+        case 0xA1: //ANA C
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->c & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->c;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
             break;
 
-        case 0xA2:
-            CPU::UnimplementedInstruction(state);
+        case 0xA2: //ANA D
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->d & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->d;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
             break;
 
-        case 0xA3:
-            CPU::UnimplementedInstruction(state);
+        case 0xA3: //ANA E
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->e & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->e;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
             break;
 
         case 0xA4:
