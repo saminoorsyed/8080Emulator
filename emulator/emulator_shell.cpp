@@ -661,32 +661,33 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0x79:
-            CPU::UnimplementedInstruction(state);
+        case 0x79: //MOV A, C
+            state->a = state->c;
             break;
 
-        case 0x7A:
-            CPU::UnimplementedInstruction(state);
+        case 0x7A: //MOV A, D
+            state->a = state->d;
             break;
 
-        case 0x7B:
-            CPU::UnimplementedInstruction(state);
+        case 0x7B: //MOV A, E
+            state->a = state->e;
             break;
 
-        case 0x7C:
-            CPU::UnimplementedInstruction(state);
+        case 0x7C: //MOV A, H
+            state->a = state->h;
             break;
 
-        case 0x7D:
-            CPU::UnimplementedInstruction(state);
+        case 0x7D: //MOV A, L
+            state->a = state->l;
             break;
 
-        case 0x7E:
-            CPU::UnimplementedInstruction(state);
+        case 0x7E: //MOV A, M
+            hl = (state->h << 8) | state->l;
+            state->a = state->mem[hl];
             break;
 
-        case 0x7F:
-            CPU::UnimplementedInstruction(state);
+        case 0x7F: //MOV A, A
+            state->a = state->a;
             break;
 
         case 0x80:
