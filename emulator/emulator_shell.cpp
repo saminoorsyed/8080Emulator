@@ -32,7 +32,7 @@ CPU::FlagCodes CPU::SetFlags(uint16_t result) {
     // Sign flag - most significant bit is set
     ResultCodes.s = 0x80 == (result & 0x80);
 
-    // Pariaty flag, check if the last bit is set
+    // Parity flag, check if the last bit is set
     ResultCodes.p = Parity(result);
 
     // Carry flag will be true if result > 255 (1111 1111)
