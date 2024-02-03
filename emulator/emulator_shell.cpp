@@ -441,7 +441,7 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0x56:
             // MOV D,M moves the number stored in the address at HL to register D
             // shift H left by 8 bits and do an or operator with L
-            uint16_t hl = (state->h<<8)| (state->l);
+            hl = (state->h<<8)| (state->l);
             state->d = state->mem[hl];
             break;
 
@@ -474,7 +474,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             break;
 
         case 0x5E:
-            uint16_t hl = (state->h<<8)|(state->l);
+            hl = (state->h<<8)|(state->l);
             state->e = state->mem[hl];
             break;
 
