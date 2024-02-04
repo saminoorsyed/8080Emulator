@@ -44,6 +44,10 @@ CPU::FlagCodes CPU::SetFlags(uint16_t result) {
     return ResultCodes;
 }
 
+bool CPU::IsAuxFlagSet(uint16_t number) {
+    return true;
+}
+
 // Function for emulating 8080 opcodes, has case for each of our opcodes
 // Unimplemented instructions will call UnimplementedInstruction function
 int CPU::Emulate8080Codes(State8080 *state){
@@ -60,114 +64,117 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0x00:
             break; // NOP
 
-        case 0x01:
+        case 0x01: // LXI B,D16
             state->b = opcode[2];
             state->c = opcode[1];
             state->pc += 2;
             break;
 
-        case 0x02:
+        case 0x02: // STAX B
             // to create bc shift bits left by 8, creating an empty 8 right bits.
             // Add state->c to the right bits with bitwise or.
             bc = (state->b << 8) | state->c;
             state->mem[bc] = state->a;
             break;
 
-        case 0x03:
+        case 0x03: // INX B
             bc = (state->b << 8) | state->c;
             bc += 1;
             state->b = bc >> 8; // delete the last 8 bits to get b alone
             state->c = (bc - (state->b << 8)); // subtract the first 8 bits to get c alone
             break;
 
-        case 0x04:
+        case 0x04: // INR B
             state->b += 1;
             result = state->b;
             state->f = SetFlags(result);
             break;
 
-        case 0x05:
+        case 0x05: // DCR B
             state->b -= 1;
             result = state->b;
             state->f = SetFlags(result);
             break;
 
-        case 0x06:
+        case 0x06: // MVI B, D8
             state->b = opcode[1];
             state->pc += 1;
             break;
 
-        case 0x07:
+        case 0x07: // RLC
             result = 0x80 == (state->a & 0x80); // get most significant bit
             state->a = state->a << 1;
             state->f.cy = result;
             break;
 
-        case 0x08:
-            break; // NOP
+        case 0x08: // NOP
+            break;
 
-        case 0x09:
+        case 0x09: // DAD B
             bc = (state->b << 8) | state->c;
             hl = (state->h << 8) | state->l;
             result = bc + hl;
-            state->b = bc >> 8;
-            state->c = (bc - (state->b << 8));
+            hl = result & 0xffff;
             state->h = hl >> 8;
             state->l = (hl - (state->h << 8));
-            state->f = SetFlags(result);
+            state->f.cy = result > 0xffff;
             break;
 
-        case 0x0A:
+        case 0x0A: // LDAX B
             bc = (state->b << 8) | state->c;
             state->a = state->mem[bc];
             break;
 
-        case 0x0B:
+        case 0x0B: // DCX B
             bc = (state->b << 8) | state->c;
             bc -= 1;
             state->b = bc >> 8;
             state->c = (bc - (state->b << 8));
             break;
 
-        case 0x0C:
-            result = state->c + 1;
-            state->c = result;
-            state->f = SetFlags(result);
+        case 0x0C: // INR C
+            state->c += 1;
+            state->f.z = state->c == 0;
+            state->f.s = 0x80 == (state->c & 0x80);
+            state->f.p = Parity(state->c);
+            state->f.ac = 1;
             break;
 
-        case 0x0D:
-            result = state->c - 1;
-            state->c = result;
-            state->f = SetFlags(result);
+        case 0x0D: // DCR C
+            state->c -= 1;
+            state->f.z = state->c == 0;
+            state->f.s = 0x80 == (state->c & 0x80);
+            state->f.p = Parity(state->c);
+            state->f.ac = 1;
             break;
 
-        case 0x0E:
+        case 0x0E: // MVI C,D8
             state->c = opcode[1];
             state->pc += 1;
             break;
 
-        case 0x0F:
+        case 0x0F: // RRC
             // the least significant bit is always 1 for odd numbers
             result = (state->a % 2 != 0);
             state->a = state->a >> 1;
             state->f.cy = result;
             break;
 
-        case 0x10:
-            break; // NOP
+        case 0x10: // NOP
+            break;
 
-        case 0x11:
+        case 0x11: // LXI D,D16
             state->d = opcode[2];
             state->e = opcode[1];
             state->pc += 2;
             break;
 
-        case 0x12:
+        case 0x12: // STAX D
             de = (state->d << 8) | state->e;
             state->mem[de] = state->a;
             break;
 
-        case 0x13:
+        case 0x13: // INX D
             de = (state->d << 8) | state->e;
             de += 1;
             state->d = de >> 8;
@@ -255,83 +262,122 @@ int CPU::Emulate8080Codes(State8080 *state){
             break;
 
         case 0x28:
-            CPU::UnimplementedInstruction(state);
+            break; // NOP
+
+        case 0x29: // DAD H
+            hl = (state->h << 8) | state->l;
+            result = hl + hl;
+            state->f.cy = (result > 0xffff);
+            hl = result & 0xffff; // we need to strip off any overflow bits
+            state->h = hl >> 8;
+            state->l = (hl - (state->h << 8));
             break;
 
-        case 0x29:
-            CPU::UnimplementedInstruction(state);
+        case 0x2A: // LHLD adr
+            result = (opcode[2] << 8) | opcode[1];
+            state->l = state->mem[result];
+            state->h = state->mem[result + 1];
+            state->pc += 2;
             break;
 
-        case 0x2A:
-            CPU::UnimplementedInstruction(state);
+        case 0x2B: // DCX H
+            hl = (state->h << 8) | state->l;
+            hl -= 1;
+            state->h = hl >> 8;
+            state->l = (hl - (state->h << 8));
             break;
 
-        case 0x2B:
-            CPU::UnimplementedInstruction(state);
+        case 0x2C: // INR L
+            state->l += 1;
+            state->f.p = Parity(state->l);
+            state->f.z = 0 == state->l;
+            state->f.s = 0x80 == (state->l & 0x80);
+            state->f.ac = 1;
             break;
 
-        case 0x2C:
-            CPU::UnimplementedInstruction(state);
+        case 0x2D: // DCR L
+            state->l -= 1;
+            state->f.p = Parity(state->l);
+            state->f.z = 0 == state->l;
+            state->f.s = 0x80 == (state->l & 0x80);
+            state->f.ac = 1;
             break;
 
-        case 0x2D:
-            CPU::UnimplementedInstruction(state);
+        case 0x2E: // MVI L, D8
+            state->l = opcode[1];
+            state->pc += 1;
             break;
 
-        case 0x2E:
-            CPU::UnimplementedInstruction(state);
+        case 0x2F: // CMA
+            state->a = state->a ^ 0xffff; // inverse bits using XOR
             break;
 
-        case 0x2F:
-            CPU::UnimplementedInstruction(state);
+        case 0x30: // NOP
             break;
 
-        case 0x30:
-            CPU::UnimplementedInstruction(state);
+        case 0x31: // LXI SP, D16
+            state->sp = (opcode[2] << 8) | opcode[1];
+            state->pc += 2;
             break;
 
-        case 0x31:
-            CPU::UnimplementedInstruction(state);
+        case 0x32: // STA adr
+            result = (opcode[2] << 8) | opcode[1];
+            state->mem[result] = state->a;
+            state->pc += 2;
             break;
 
-        case 0x32:
-            CPU::UnimplementedInstruction(state);
+        case 0x33: // INX SP
+            state->sp += 1;
             break;
 
-        case 0x33:
-            CPU::UnimplementedInstruction(state);
+        case 0x34: // INR M
+            hl = (state->h << 8) | state->l;
+            state->mem[hl] = state->mem[hl] + 1;
+            state->f.p = Parity(state->mem[hl]);
+            state->f.z = 0 == state->mem[hl];
+            state->f.s = 0x8000 == (state->mem[hl] & 0x8000);
+            state->f.ac = 1;
             break;
 
-        case 0x34:
-            CPU::UnimplementedInstruction(state);
+        case 0x35: // DCR M
+            hl = (state->h << 8) | state->l;
+            state->mem[hl] = state->mem[hl] - 1;
+            state->f.p = Parity(state->mem[hl]);
+            state->f.z = 0 == state->mem[hl];
+            state->f.s = 0x8000 == (state->mem[hl] & 0x8000);
+            state->f.ac = 1;
             break;
 
-        case 0x35:
-            CPU::UnimplementedInstruction(state);
+        case 0x36: // MVI M,D8
+            hl = (state->h << 8) | state->l;
+            state->mem[hl] = opcode[1];
+            state->pc += 1;
             break;
 
-        case 0x36:
-            CPU::UnimplementedInstruction(state);
+        case 0x37: // STC
+            state->f.cy = 1;
             break;
 
-        case 0x37:
-            CPU::UnimplementedInstruction(state);
+        case 0x38: // NOP
             break;
 
-        case 0x38:
-            CPU::UnimplementedInstruction(state);
+        case 0x39: // DAD SP
+            hl = (state->h << 8) | state->l;
+            result = hl + state->sp;
+            state->f.cy = (hl > 0xffff);
+            hl = result & 0xffff;
+            state->h = hl >> 8;
+            state->l = (hl - (state->h << 8));
             break;
 
-        case 0x39:
-            CPU::UnimplementedInstruction(state);
+        case 0x3A: // LDA adr
+            result = (opcode[2] << 8) | opcode[1];
+            state->a = state->mem[result];
+            state->pc += 2;
             break;
 
-        case 0x3A:
-            CPU::UnimplementedInstruction(state);
-            break;
-
-        case 0x3B:
-            CPU::UnimplementedInstruction(state);
+        case 0x3B: // DCX SP
+            state->sp -= 1;
             break;
 
         case 0x3C:
