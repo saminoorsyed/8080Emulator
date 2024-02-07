@@ -44,7 +44,7 @@ CPU::FlagCodes CPU::SetFlags(uint16_t result) {
     return ResultCodes;
 }
 
-uint8_t CPU::FlagCalc(FlagCodes flagState){
+uint8_t CPU::FlagCalc(CPU::FlagCodes flagState){
     uint8_t FlagValue;
     // calculate Flag register value based on:
     //   |7 |6 |5 |4 |3 |2 |1 |0 |
