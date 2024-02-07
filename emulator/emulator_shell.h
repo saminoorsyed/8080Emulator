@@ -44,4 +44,6 @@ public:
 
     bool Parity(uint16_t number);
 
+    bool IsAuxFlagSet(uint16_t number);
+
 };
