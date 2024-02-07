@@ -543,92 +543,94 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0x50:
+        case 0x50: // MOV D,B
             state->d = state->b;
             break;
 
-        case 0x51:
+        case 0x51: // MOV D,C
             state->d = state->c;
             break;
 
-        case 0x52:
+        case 0x52: // MOV D,D
             // state->d = state->d; This operation does nothing MOV D, D
             break;
 
-        case 0x53:
+        case 0x53: // MOV D,E
             state->d = state->e;
             break;
 
-        case 0x54:
+        case 0x54: // MOV D,H
             state->d = state->h;
             break;
 
-        case 0x55:
+        case 0x55: // MOV D,L
             state->d = state->l;
             break;
 
-        case 0x56:
-            // MOV D,M moves the number stored in the address at HL to register D
+        case 0x56: // MOV D,M
+            // moves the number stored in the address at HL to register D
             // shift H left by 8 bits and do an or operator with L
             hl = (state->h<<8)| (state->l);
             state->d = state->mem[hl];
             break;
 
-        case 0x57:
+        case 0x57: // MOV D,A
             state->d = state->a;
             break;
 
-        case 0x58:
+        case 0x58: // MOV E,B
             state->e = state->b;
             break;
 
-        case 0x59:
+        case 0x59: // MOV E,C
             state->e = state->c;
             break;
 
-        case 0x5A:
+        case 0x5A: // MOV E,D
             state->e = state->d;
             break;
 
-        case 0x5B:
-            // state->e = state->e; this code does nothing
+        case 0x5B: // MOV E,E
+            // state->e = state->e; this code does nothing so I've left it empty
             break;
 
-        case 0x5C:
+        case 0x5C: // MOV E,H
             state->e = state->h;
             break;
 
-        case 0x5D:
+        case 0x5D: // MOV E,L
             state->e = state->l;
             break;
 
-        case 0x5E:
+        case 0x5E: // MOV E,M
+            // moves the number stored in the address at HL to register D
+            // shift H left by 8 bits and do an or operator with L
             hl = (state->h<<8)|(state->l);
             state->e = state->mem[hl];
             break;
 
-        case 0x5F:
+        case 0x5F: // MOV E,A
             state->e = state->a;
             break;
 
-        case 0x60:
+        case 0x60: // MOV H,B
             state->h = state->b;
             break;
 
-        case 0x61:
+        case 0x61: // MOV H,C
             state->h = state->c;
             break;
 
-        case 0x62:
+        case 0x62: // MOV H,D
             state->h = state->d;
             break;
 
-        case 0x63:
+        case 0x63: // MOV H,E
             state->h = state->e;
             break;
 
-        case 0x64:
-            state->h = state->h;
+        case 0x64: // MOV H,H
+            // state->h = state->h; this does nothing so I've left it empty
             break;
 
         case 0x65:
