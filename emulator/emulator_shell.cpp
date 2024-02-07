@@ -1366,12 +1366,15 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xCD: //CALL a16
             // save the address of the next instruction 
             result = state->pc + 2;
+            // split address into two bytes
+            upperdec = (result >> 8) & 0xff;
+            lowerdec = result & 0xff;
             // The stack grows toward lower addresses and info is popped from lower addresses first
             // little Endian architecture means the LSB should be read first,
             // so the lower byte is stored in the lower address
             // and the high byte in the higher address
-            state->mem[state->sp-1] = (result >> 8) & 0xff ; //push high byte to stack
-            state->mem[state->sp-2] = (result & 0xff); //push low byte to stack
+            state->mem[state->sp-1] = upperdec; 
+            state->mem[state->sp-2] = lowerdec; 
             
             // stack grows downward
             state->sp -= 2;
@@ -1379,16 +1382,37 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->pc = (opcode[2] << 8) | opcode[1];
             break;
 
-        case 0xCE:
-            CPU::UnimplementedInstruction(state);
+        case 0xCE: // ACI d8
+            result = state->a +opcode[1]+state->f.cy; //add accumulator, immediate byte and carry flag
+            state->f = SetFlags(result);
+            state->a = result & 0xff; // store lower 8 bits in register A
+            state->pc++; //increment the pointer
             break;
 
-        case 0xCF:
-            CPU::UnimplementedInstruction(state);
+        case 0xCF://RST1
+            // Store the pointer counter in two parts to be pushed to the stack
+            upperdec = (state->pc >> 8) & 0xff;
+            lowerdec = state->pc & 0xff;
+
+            state->mem[state->sp-1] = upperdec;
+            state->mem[state->sp-2] = lowerdec;
+
+            state->sp -= 2;
+
+            // sets pc to predefined location
+            state->pc = 0x0008;
             break;
 
-        case 0xD0:
-            CPU::UnimplementedInstruction(state);
+        case 0xD0: // RNC
+            if (!state->f.cy){
+                // If the carry flag is not set read the immediate address
+                result = (opcode[2]<<8) | opcode[1];
+                // Jump to the address
+                state->pc = result;
+            }else{
+                // If the carry flag is set, do not jump to the address
+                state->pc +=2;
+            }
             break;
 
         case 0xD1:
