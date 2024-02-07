@@ -326,7 +326,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             if (lowerdec > 9 || state->f.ac == 1)
             {
                 state->a += 6;
-                if (lowerdec > 15) state->f.ac = 1;
+                state->f.ac = lowerdec > 15;
             }
 
             upperdec = state->a >> 4;
@@ -335,7 +335,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             if (upperdec > 9 || state->f.cy == 1)
             {
                 upperdec += 6;
-                if (upperdec > 15) state->f.cy = 1;
+                state->f.cy = upperdec > 15;
             }
 
             state->a = upperdec << 4 | lowerdec;
@@ -711,96 +711,275 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0x79:
-            CPU::UnimplementedInstruction(state);
+        case 0x79: //MOV A, C
+            state->a = state->c;
             break;
 
-        case 0x7A:
-            CPU::UnimplementedInstruction(state);
+        case 0x7A: //MOV A, D
+            state->a = state->d;
             break;
 
-        case 0x7B:
-            CPU::UnimplementedInstruction(state);
+        case 0x7B: //MOV A, E
+            state->a = state->e;
             break;
 
-        case 0x7C:
-            CPU::UnimplementedInstruction(state);
+        case 0x7C: //MOV A, H
+            state->a = state->h;
             break;
 
-        case 0x7D:
-            CPU::UnimplementedInstruction(state);
+        case 0x7D: //MOV A, L
+            state->a = state->l;
             break;
 
-        case 0x7E:
-            CPU::UnimplementedInstruction(state);
+        case 0x7E: //MOV A, M
+            hl = (state->h << 8) | state->l;
+            state->a = state->mem[hl];
             break;
 
-        case 0x7F:
-            CPU::UnimplementedInstruction(state);
+        case 0x7F: //MOV A, A
+            state->a = state->a;
             break;
 
-        case 0x80:
-            CPU::UnimplementedInstruction(state);
+        case 0x80: //ADD B
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->b & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->b;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x81:
-            CPU::UnimplementedInstruction(state);
+        case 0x81: //ADD C
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->c & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->c;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x82:
-            CPU::UnimplementedInstruction(state);
+        case 0x82: //ADD D
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->d & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->d;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x83:
-            CPU::UnimplementedInstruction(state);
+        case 0x83: //ADD E
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->e & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->e;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x84:
-            CPU::UnimplementedInstruction(state);
+        case 0x84: //ADD H
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->h & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->h;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x85:
-            CPU::UnimplementedInstruction(state);
+        case 0x85: //ADD L
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->l & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->l;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x86:
-            CPU::UnimplementedInstruction(state);
+        case 0x86: //ADD M
+            hl = (state->h << 8) | state->l;
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->mem[hl] & 0x0F; //Pulls mem value low 4 bit nibble
+
+            result = state->a + state->mem[hl];
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x87:
-            CPU::UnimplementedInstruction(state);
+        case 0x87: //ADD A
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->a & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->a;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x88:
-            CPU::UnimplementedInstruction(state);
+        case 0x88: //ADC B
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->b & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->b + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x89:
-            CPU::UnimplementedInstruction(state);
+        case 0x89: //ADC C
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->c & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->c + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x8A:
-            CPU::UnimplementedInstruction(state);
+        case 0x8A: //ADC D
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->d & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->d + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x8B:
-            CPU::UnimplementedInstruction(state);
+        case 0x8B: //ADC E
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->e & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->e + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x8C:
-            CPU::UnimplementedInstruction(state);
+        case 0x8C: //ADC H
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->h & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->h + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x8D:
-            CPU::UnimplementedInstruction(state);
+        case 0x8D: //ADC L
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->l & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->l + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x8E:
-            CPU::UnimplementedInstruction(state);
+        case 0x8E: //ADC M
+            hl = (state->h << 8) | state->l;
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->mem[hl] & 0x0F) + state->f.cy; //Pulls added mem low 4 bit nibble, adds CY value
+
+            result = state->a + state->mem[hl] + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
-        case 0x8F:
-            CPU::UnimplementedInstruction(state);
+        case 0x8F: //ADC A
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->a & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->a + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
             break;
 
         case 0x90: //SUB B
