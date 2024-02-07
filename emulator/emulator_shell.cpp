@@ -1354,12 +1354,29 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0xCC:
-            CPU::UnimplementedInstruction(state);
+        case 0xCC: //CZ a16
+            if (state->f.z){  //if the zero flag is set, jump to address stored in memory
+                 result = opcode[2]<<8 | opcode[1];
+                 state->pc = result;
+            }else{
+                state->pc += 2;
+            }
             break;
 
-        case 0xCD:
-            CPU::UnimplementedInstruction(state);
+        case 0xCD: //CALL a16
+            // save the address of the next instruction 
+            result = state->pc + 2;
+            // The stack grows toward lower addresses and info is popped from lower addresses first
+            // little Endian architecture means the LSB should be read first,
+            // so the lower byte is stored in the lower address
+            // and the high byte in the higher address
+            state->mem[state->sp-1] = (result >> 8) & 0xff ; //push high byte to stack
+            state->mem[state->sp-2] = (result & 0xff); //push low byte to stack
+            
+            // stack grows downward
+            state->sp -= 2;
+            // Jump to the address immediately after the pc
+            state->pc = (opcode[2] << 8) | opcode[1];
             break;
 
         case 0xCE:
