@@ -837,84 +837,129 @@ int CPU::Emulate8080Codes(State8080 *state){
             CPU::UnimplementedInstruction(state);
             break;
 
-        case 0xA4:
-            CPU::UnimplementedInstruction(state);
+        case 0xA4:  // ANA H
+            state->a = state->a & state->h;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xA5:
-            CPU::UnimplementedInstruction(state);
+        case 0xA5:  // ANA L
+            state->a = state->a & state->l;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xA6:
-            CPU::UnimplementedInstruction(state);
             break;
 
-        case 0xA7:
-            CPU::UnimplementedInstruction(state);
+        case 0xA6:  // ANA M
+            hl = (state->h << 8) | state->l;
+            state->a = state-> a & state->mem[hl];
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xA8:
-            CPU::UnimplementedInstruction(state);
+        case 0xA7:  // ANA A - this doesn't actually do anything except clear the cy and ac flags
+            state->a = state->a & state->a;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xA9:
-            CPU::UnimplementedInstruction(state);
+        case 0xA8:  // XRA B
+            state->a = state->a ^ state->b;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xAA:
-            CPU::UnimplementedInstruction(state);
+        case 0xA9:  // XRA C
+            state->a = state->a ^ state->c;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xAB:
-            CPU::UnimplementedInstruction(state);
+        case 0xAA:  // XRA D
+            state->a = state->a ^ state->d;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xAC:
-            CPU::UnimplementedInstruction(state);
+        case 0xAB:  // XRA E
+            state->a = state->a ^ state->e;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xAD:
-            CPU::UnimplementedInstruction(state);
+        case 0xAC:  // XRA H
+            state->a = state->a ^ state->h;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xAE:
-            CPU::UnimplementedInstruction(state);
+        case 0xAD:  // XRA L
+            state->a = state->a ^ state->l;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xAF:
-            CPU::UnimplementedInstruction(state);
+        case 0xAE:  // XRA M
+            hl = (state->h << 8) | state->l;
+            state->a = state-> a ^ state->mem[hl];
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB0:
-            CPU::UnimplementedInstruction(state);
+        case 0xAF:  // XRA A - this doesn't actually do anything except clear the cy and ac flags
+            state->a = state->a ^ state->a;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB1:
-            CPU::UnimplementedInstruction(state);
+        case 0xB0:  // ORA B
+            state->a = state->a | state->b;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB2:
-            CPU::UnimplementedInstruction(state);
+        case 0xB1:  // ORA C
+            state->a = state->a | state->c;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB3:
-            CPU::UnimplementedInstruction(state);
+        case 0xB2:  // ORA D
+            state->a = state->a | state->d;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB4:
-            CPU::UnimplementedInstruction(state);
+        case 0xB3:  // ORA E
+            state->a = state->a | state->e;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB5:
-            CPU::UnimplementedInstruction(state);
+        case 0xB4:  // ORA H
+            state->a = state->a | state->h;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB6:
-            CPU::UnimplementedInstruction(state);
+        case 0xB5:  // ORA L
+            state->a = state->a | state->l;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
-        case 0xB7:
-            CPU::UnimplementedInstruction(state);
+        case 0xB6:  // ORA M
+            hl = (state->h << 8) | state->l;
+            state->a = state-> a | state->mem[hl];
+            state->f.cy = 0;
+            state->f.ac = 0;
+            break;
+
+        case 0xB7:  // ORA A
+            state->a = state->a | state->a;
+            state->f.cy = 0;
+            state->f.ac = 0;
             break;
 
         case 0xB8:
