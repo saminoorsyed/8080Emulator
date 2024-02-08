@@ -44,6 +44,16 @@ CPU::FlagCodes CPU::SetFlags(uint16_t result) {
     return ResultCodes;
 }
 
+uint8_t CPU::FlagCalc(CPU::FlagCodes flagState){
+    uint8_t FlagValue;
+    // calculate Flag register value based on:
+    //   |7 |6 |5 |4 |3 |2 |1 |0 |
+    //   |s |z |- |ac|- |p |- |cy|
+    FlagValue = flagState.cy + (flagState.p * 4) + (flagState.ac * 16)
+                + (flagState.z * 64) + (flagState.s * 128);
+    return FlagValue;
+}
+
 bool CPU::IsAuxFlagSet(uint16_t number) {
     return true;
 }
@@ -464,83 +474,111 @@ int CPU::Emulate8080Codes(State8080 *state){
             break;
 
         case 0x3C:
-            CPU::UnimplementedInstruction(state);
+            // INR A
+            state->a += 1;
+            result = state->a;
+            state->f = SetFlags(result);
             break;
 
         case 0x3D:
-            CPU::UnimplementedInstruction(state);
+            // DCR A
+            state->a -= 1;
+            result = state-> a;
+            state->f = SetFlags(result);
             break;
 
         case 0x3E:
-            CPU::UnimplementedInstruction(state);
+            // MVI A, 0x%02x, code[1] -- 2 opBytes
+            state->a = opcode[1];
+            state->pc += 1;
             break;
 
         case 0x3F:
-            CPU::UnimplementedInstruction(state);
+            // CMC
+            // Complement of the carry flag. Flips the carry bit of the flags register
+            state->f.cy = (!state->f.cy);
             break;
 
         case 0x40:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, B
+            state->b = state->b;
             break;
 
         case 0x41:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, C
+            state->b = state->c;
             break;
 
         case 0x42:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, F
+            state->b = FlagCalc(state->f);
             break;
 
         case 0x43:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, E
+            state->b = state->e;
             break;
 
         case 0x44:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, H
+            state->b = state->h;
             break;
 
         case 0x45:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, L
+            state->b = state->l;
             break;
 
         case 0x46:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, M
+            hl = (state->h << 8) | state->l;
+            state->b = state->mem[hl];
             break;
 
         case 0x47:
-            CPU::UnimplementedInstruction(state);
+            // MOV B, A
+            state->b = state->a;
             break;
 
         case 0x48:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, B
+            state->c = state->b;
             break;
 
         case 0x49:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, C
+            state->c = state->c;
             break;
 
         case 0x4A:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, D
+            state->c = state->d;
             break;
 
         case 0x4B:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, E
+            state->c = state->e;
             break;
 
         case 0x4C:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, H
+            state->c = state->h;
             break;
 
         case 0x4D:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, L
+            state->c = state->l;
             break;
 
         case 0x4E:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, M
+            hl = (state->h << 8) | state->l;
+            state->c = state->mem[hl];
             break;
 
         case 0x4F:
-            CPU::UnimplementedInstruction(state);
+            // MOV C, A
+            state->c = state->a;
             break;
 
         case 0x50:
