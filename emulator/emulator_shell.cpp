@@ -1363,9 +1363,12 @@ int CPU::Emulate8080Codes(State8080 *state)
 
     case 0xCC: // CZ a16
         if (state->f.z)
-        { // if the zero flag is set, jump to address stored in memory
-            result = opcode[2] << 8 | opcode[1];
-            state->pc = result;
+        {
+            result = state->pc + 3;                    // save the address of the next instruction
+            state->mem[state->sp - 1] = (result >> 8); // high-order bits in higher stack addr
+            state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
+            state->sp -= 2;
+            state->pc = opcode[2] << 8 | opcode[1];
         }
         else
         {
@@ -1373,59 +1376,53 @@ int CPU::Emulate8080Codes(State8080 *state)
         }
         break;
 
-    case 0xCD:                  // CALL a16
-        result = state->pc + 2; // save the address of the next instruction
-        // The stack grows toward lower addresses and info is popped from lower addresses first
-        // little Endian architecture means the LSB should be read first,
-        // so the lower byte is stored in the lower address
-        // and the high byte in the higher address
-        state->mem[state->sp - 1] = (result >> 8) & 0xff;
-        state->mem[state->sp - 2] = result & 0xff;
-        state->sp -= 2;                           // stack grows downward
-        state->pc = (opcode[2] << 8) | opcode[1]; // Jump to the address immediately after the pc
+    case 0xCD:                                     // CALL a16
+        result = state->pc + 3;                    // save the address of the next instruction
+        state->mem[state->sp - 1] = (result >> 8); // high-order bits in higher stack addr
+        state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
+        state->sp -= 2;                            // stack grows downward
+        state->pc = (opcode[2] << 8) | opcode[1];  // Jump to the address immediately after the pc
         break;
 
     case 0xCE:                                       // ACI d8
         result = state->a + opcode[1] + state->f.cy; // add accumulator, immediate byte and carry flag
-        state->f = SetFlags(result);
-        state->a = result & 0xff; // store lower 8 bits in register A
-        state->pc++;              // increment the pointer
+        state->f = SetFlags(result);                 // set flags
+        state->a = result & 0xff;                    // store lower 8 bits in register A
+        state->pc++;                                 // increment the pointer
         break;
 
-    case 0xCF: // RST1
-
-        result = state->pc + 1;
-        state->mem[state->sp - 1] = (result >> 8) & 0xff; // Store the address of the next instruction on the stack
-        state->mem[state->sp - 2] = result & 0xff;
-        state->sp -= 2;     // stack grows downward
-        state->pc = 0x0008; // sets pc to 8 times the number associated with RST (8*1)
+    case 0xCF:                                     // RST1
+        result = state->pc + 1;                    // save the address of the next instruction
+        state->mem[state->sp - 1] = (result >> 8); // high-order bits in higher stack addr
+        state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
+        state->sp -= 2;                            // stack grows downward
+        state->pc = 0x0008;                        // sets pc to 8 multiplied by the number associated with RST (8*1)
         break;
 
     case 0xD0: // RNC
         if (!state->f.cy)
-        { // If the carry flag is not set read address from stack
-            result = (state->mem[state->sp + 1] << 8) | state->mem[state->sp];
-            state->pc = result;
-            state->sp += 2;
+        {
+            result = (state->mem[state->sp + 1] << 8) | state->mem[state->sp]; // Construct the return address from Stack
+            state->pc = result;                                                // Jump to the return address
+            state->sp += 2;                                                    // shorten the stack
         }
         break;
 
-    case 0xD1: // POP D
-        // store bytes from the top of the stack into register DE
-        state->e = state->mem[state->sp];
-        state->d = state->mem[state->sp + 1];
-        state->sp += 2;
+    case 0xD1:                                // POP D
+        state->d = state->mem[state->sp + 1]; // high-addr bits in higher order register
+        state->e = state->mem[state->sp];     // low-addr bits in lower order register
+        state->sp += 2;                       // shorten the stack
         break;
 
     case 0xD2: // JNC a16
-        if (state->f.cy)
+        if (!state->f.cy)
         {
             result = (opcode[2] << 8) | opcode[1]; // retrieve address from immediate data
             state->pc = result;                    // jump pc to address
         }
         else
         {
-            state->pc += 2;
+            state->pc += 2; // if the carry flag is set. move to the next instruction
         }
         break;
 
@@ -1438,15 +1435,15 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xD4: // CNC
         if (!state->f.cy)
         {
-            result = state->pc + 2;                           // push the address of the next instruction to the stack
-            state->mem[state->sp - 1] = (result >> 8) & 0xff; // higher 8 bits to the higher sp
-            state->mem[state->sp - 2] = result & 0xff;        // lower 8 bits to the lower sp
-            state->sp -= 2;                                   // stack grows downward
-            state->pc = (opcode[2] << 8) | opcode[1];
+            result = state->pc + 3;                    // push the address of the next instruction to the stack
+            state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
+            state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
+            state->sp -= 2;                            // stack grows downward
+            state->pc = (opcode[2] << 8) | opcode[1];  // jump to addr in immediate data
         }
         else
         {
-            state->pc += 2;
+            state->pc += 2; // if the carry flag is set, move pc to the next instruction
         }
         break;
 
@@ -1457,22 +1454,23 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xD6:                              // SUI d8
-        result = state->a + ~opcode[1] + 1; // two's compliment
-        state->f = SetFlags(result);
-        state->a = result & 0xff;
+        result = state->a + ~opcode[1] + 1; // two's compliment subtraction
+        state->f = SetFlags(result);        // set the flags
+        state->a = result & 0xff;           // store the bottom 8 bits
+        state->pc++;
         break;
 
-    case 0xD7:                  // RST 2
-        result = state->pc + 1; // Store the address of the next instruction on the stack
-        state->mem[state->sp - 1] = (result >> 8) & 0xff;
-        state->mem[state->sp - 2] = result & 0xff;
-        state->sp -= 2;     // stack grows downward
-        state->pc = 0x0016; // sets pc to 8 times the number associated with RST (8*2)
+    case 0xD7:                                     // RST 2
+        result = state->pc + 1;                    // Store the address of the next instruction on the stack
+        state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
+        state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
+        state->sp -= 2;                            // stack grows downward
+        state->pc = 0x0016;                        // sets pc to 8 multiplied by the number associated with RST (8*2)
         break;
 
     case 0xD8: // RC
         if (state->f.cy)
-        {                                                                      // If the carry flag is set read address from stack
+        {
             result = (state->mem[state->sp + 1] << 8) | state->mem[state->sp]; // load address from the stack
             state->pc = result;
             state->sp += 2;
@@ -1504,11 +1502,11 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xDC: // CC A16
         if (state->f.cy)
         {
-            result = state->pc + 2;                           // push the address of the next instruction to the stack
-            state->mem[state->sp - 1] = (result >> 8) & 0xff; // higher 8 bits to the higher sp
-            state->mem[state->sp - 2] = result & 0xff;        // lower 8 bits to the lower sp
-            state->sp -= 2;                                   // stack grows downward
-            state->pc = (opcode[2] << 8) | opcode[1];         // jump to address loaded from immediate data
+            result = state->pc + 3;                    // push the address of the next instruction to the stack
+            state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
+            state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
+            state->sp -= 2;                            // stack grows downward
+            state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
         }
         else
         {
@@ -1516,27 +1514,27 @@ int CPU::Emulate8080Codes(State8080 *state)
         }
         break;
 
-    case 0xDD:                                            //*Call a16
-        result = state->pc + 2;                           // push the address of the next instruction to the stack
-        state->mem[state->sp - 1] = (result >> 8) & 0xff; // higher 8 bits to the higher sp
-        state->mem[state->sp - 2] = result & 0xff;        // lower 8 bits to the lower sp
-        state->sp -= 2;                                   // stack grows downward
-        state->pc = (opcode[2] << 8) | opcode[1];         // jump to address loaded from immediate data
+    case 0xDD:                                     //*Call a16
+        result = state->pc + 3;                    // push the address of the next instruction to the stack
+        state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
+        state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
+        state->sp -= 2;                            // stack grows downward
+        state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
         break;
 
     case 0xDE:                                              // SBI d8
         result = state->a + ~(opcode[1] + state->f.cy) + 1; // twos compliment difference of the accumulator and the sum of immediate 8 bits and carry flag
-        state->f = SetFlags(result);
-        state->a = result & 0xff; // only store the least significant 8 bits
-        state->pc++;
+        state->f = SetFlags(result);                        // set flags
+        state->a = result & 0xff;                           // only store the least significant 8 bits
+        state->pc++;                                        // Increment the pc past immediate data
         break;
 
-    case 0xDF:                  // RST 3
-        result = state->pc + 1; // Store the address of the next instruction on the stack
-        state->mem[state->sp - 1] = (result >> 8) & 0xff;
-        state->mem[state->sp - 2] = result & 0xff;
-        state->sp -= 2;     // stack grows downward
-        state->pc = 0x0024; // sets pc to 8 times the number associated with RST (8*3)
+    case 0xDF:                                     // RST 3
+        result = state->pc + 1;                    // Store the address of the next instruction on the stack
+        state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
+        state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
+        state->sp -= 2;                            // stack grows downward
+        state->pc = 0x0024;                        // sets pc to 8 multiplied by the number associated with RST (8*3)
         break;
 
     case 0xE0:
