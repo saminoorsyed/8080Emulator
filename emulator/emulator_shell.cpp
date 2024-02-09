@@ -1383,52 +1383,98 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->f.p = Parity(result & 0xFF);
             break;
 
-        case 0xC0:
-            CPU::UnimplementedInstruction(state);
+        case 0xC0: //RNZ
+            if(!(state->f.z)){
+                state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+                state->sp += 2;
+            }
             break;
 
-        case 0xC1:
-            CPU::UnimplementedInstruction(state);
+        case 0xC1: //POP B
+            state->c = state->mem[state->sp];
+            state->b = state->mem[state->sp+1];
+            state->sp += 2;
             break;
 
-        case 0xC2:
-            CPU::UnimplementedInstruction(state);
+        case 0xC2: //JNZ a16
+            if(!(state->f.z)){
+                state->pc = (opcode[2] << 8) | opcode[1];
+            }
+            else{
+                state->pc += 2;
+            }
             break;
 
-        case 0xC3:
-            CPU::UnimplementedInstruction(state);
+        case 0xC3: //JMP a16
+            state->pc = (opcode[2] << 8) | opcode[1];
             break;
 
-        case 0xC4:
-            CPU::UnimplementedInstruction(state);
+        case 0xC4: //CNZ a16
+            if(!(state->f.z)){
+                result = state->pc + 2;
+                state->mem[state->sp-1] = (result >> 8) & 0xFF;
+                state->mem[state->sp-2] = (result & 0xFF);
+                state->sp = state->sp - 2;
+                state->pc = (opcode[2] << 8) | opcode[1];
+            }
+            else{
+                state->pc += 2;
+            }
             break;
 
-        case 0xC5:
-            CPU::UnimplementedInstruction(state);
+        case 0xC5: //PUSH B
+            state->mem[state->sp-1] = state->b;
+            state->mem[state->sp-2] = state->c;
+            state->sp -= 2;
             break;
 
-        case 0xC6:
-            CPU::UnimplementedInstruction(state);
+        case 0xC6: //ADI d8
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = opcode[1] & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + opcode[1];
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            state->pc++; //Increment past used opcode
             break;
 
-        case 0xC7:
-            CPU::UnimplementedInstruction(state);
+        case 0xC7: //RST 0
+            result = state->pc + 1;
+            state->mem[state->sp - 1] = (result >> 8);
+            state->mem[state->sp -2] = (result & 0xFF);
+            state->sp -= 2;
+            state->pc = 0x0000;
             break;
 
-        case 0xC8:
-            CPU::UnimplementedInstruction(state);
+        case 0xC8: //RZ
+            if(state->f.z){
+                state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+                state->sp += 2;
+            }
             break;
 
-        case 0xC9:
-            CPU::UnimplementedInstruction(state);
+        case 0xC9: //RET
+            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+            state->sp += 2;
             break;
 
-        case 0xCA:
-            CPU::UnimplementedInstruction(state);
+        case 0xCA: //JZ a16
+            if(state->f.z){
+                state->pc = (opcode[2] << 8) | opcode[1];
+            }
+            else{
+                state->pc += 2;
+            }
             break;
 
-        case 0xCB:
-            CPU::UnimplementedInstruction(state);
+        case 0xCB: //JMP a16
+            state->pc = (opcode[2] << 8) | opcode[1];
             break;
 
         case 0xCC:
