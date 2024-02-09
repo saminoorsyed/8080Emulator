@@ -1441,7 +1441,6 @@ int CPU::Emulate8080Codes(State8080 *state){
 
             result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
             state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
-            state->pc++; //Increment past used opcode
             break;
 
         case 0xC7: //RST 0
