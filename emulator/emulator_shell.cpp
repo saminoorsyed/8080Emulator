@@ -48,8 +48,17 @@ CPU::FlagCodes CPU::SetFlags(uint16_t result)
     return ResultCodes;
 }
 
-bool CPU::IsAuxFlagSet(uint16_t number)
-{
+uint8_t CPU::FlagCalc(CPU::FlagCodes flagState){
+    uint8_t FlagValue;
+    // calculate Flag register value based on:
+    //   |7 |6 |5 |4 |3 |2 |1 |0 |
+    //   |s |z |- |ac|- |p |- |cy|
+    FlagValue = flagState.cy + (flagState.p * 4) + (flagState.ac * 16)
+                + (flagState.z * 64) + (flagState.s * 128);
+    return FlagValue;
+}
+
+bool CPU::IsAuxFlagSet(uint16_t number) {
     return true;
 }
 
@@ -465,742 +474,768 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = state->mem[result];
         state->pc += 2;
         break;
-
+ 
     case 0x3B: // DCX SP
-        state->sp -= 1;
-        break;
-
-    case 0x3C:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x3D:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x3E:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x3F:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x40:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x41:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x42:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x43:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x44:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x45:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x46:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x47:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x48:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x49:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x4A:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x4B:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x4C:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x4D:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x4E:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x4F:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x50: // MOV D,B
-        state->d = state->b;
-        break;
-
-    case 0x51: // MOV D,C
-        state->d = state->c;
-        break;
-
-    case 0x52: // MOV D,D
-        // state->d = state->d; This operation does nothing MOV D, D
-        break;
-
-    case 0x53: // MOV D,E
-        state->d = state->e;
-        break;
-
-    case 0x54: // MOV D,H
-        state->d = state->h;
-        break;
-
-    case 0x55: // MOV D,L
-        state->d = state->l;
-        break;
-
-    case 0x56: // MOV D,M
-        // moves the number stored in the address at HL to register D
-        // shift H left by 8 bits and do an or operator with L
-        hl = (state->h << 8) | (state->l);
-        state->d = state->mem[hl];
-        break;
-
-    case 0x57: // MOV D,A
-        state->d = state->a;
-        break;
-
-    case 0x58: // MOV E,B
-        state->e = state->b;
-        break;
-
-    case 0x59: // MOV E,C
-        state->e = state->c;
-        break;
-
-    case 0x5A: // MOV E,D
-        state->e = state->d;
-        break;
-
-    case 0x5B: // MOV E,E
-        // state->e = state->e; this code does nothing so I've left it empty
-        break;
-
-    case 0x5C: // MOV E,H
-        state->e = state->h;
-        break;
-
-    case 0x5D: // MOV E,L
-        state->e = state->l;
-        break;
-
-    case 0x5E: // MOV E,M
-        // moves the number stored in the address at HL to register D
-        // shift H left by 8 bits and do an or operator with L
-        hl = (state->h << 8) | (state->l);
-        state->e = state->mem[hl];
-        break;
-
-    case 0x5F: // MOV E,A
-        state->e = state->a;
-        break;
-
-    case 0x60: // MOV H,B
-        state->h = state->b;
-        break;
-
-    case 0x61: // MOV H,C
-        state->h = state->c;
-        break;
-
-    case 0x62: // MOV H,D
-        state->h = state->d;
-        break;
-
-    case 0x63: // MOV H,E
-        state->h = state->e;
-        break;
-
-    case 0x64: // MOV H,H
-        // state->h = state->h; this does nothing so I've left it empty
-        break;
-
-    case 0x65:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x66:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x67:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x68:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x69:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x6A:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x6B:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x6C:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x6D:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x6E:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x6F:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x70:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x71:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x72:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x73:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x74:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x75:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x76:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x77:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x78:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0x79: // MOV A, C
-        state->a = state->c;
-        break;
-
-    case 0x7A: // MOV A, D
-        state->a = state->d;
-        break;
-
-    case 0x7B: // MOV A, E
-        state->a = state->e;
-        break;
-
-    case 0x7C: // MOV A, H
-        state->a = state->h;
-        break;
-
-    case 0x7D: // MOV A, L
-        state->a = state->l;
-        break;
-
-    case 0x7E: // MOV A, M
-        hl = (state->h << 8) | state->l;
-        state->a = state->mem[hl];
-        break;
-
-    case 0x7F: // MOV A, A
-        state->a = state->a;
-        break;
-
-    case 0x80:                      // ADD B
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->b & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->b;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x81:                      // ADD C
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->c & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->c;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x82:                      // ADD D
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->d & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->d;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x83:                      // ADD E
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->e & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->e;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x84:                      // ADD H
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->h & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->h;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x85:                      // ADD L
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->l & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->l;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x86: // ADD M
-        hl = (state->h << 8) | state->l;
-        lowerdec = state->a & 0x0F;       // Pulls register A low 4 bit nibble
-        upperdec = state->mem[hl] & 0x0F; // Pulls mem value low 4 bit nibble
-
-        result = state->a + state->mem[hl];
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x87:                      // ADD A
-        lowerdec = state->a & 0x0F; // Pulls register A low 4 bit nibble
-        upperdec = state->a & 0x0F; // Pulls added register low 4 bit nibble
-
-        result = state->a + state->a;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x88:                                      // ADC B
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->b & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->b + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x89:                                      // ADC C
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->c & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->c + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x8A:                                      // ADC D
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->d & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->d + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x8B:                                      // ADC E
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->e & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->e + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x8C:                                      // ADC H
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->h & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->h + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x8D:                                      // ADC L
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->l & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->l + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x8E: // ADC M
-        hl = (state->h << 8) | state->l;
-        lowerdec = state->a & 0x0F;                       // Pulls register A low 4 bit nibble
-        upperdec = (state->mem[hl] & 0x0F) + state->f.cy; // Pulls added mem low 4 bit nibble, adds CY value
-
-        result = state->a + state->mem[hl] + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x8F:                                      // ADC A
-        lowerdec = state->a & 0x0F;                 // Pulls register A low 4 bit nibble
-        upperdec = (state->a & 0x0F) + state->f.cy; // Pulls added register low 4 bit nibble, adds CY value
-
-        result = state->a + state->a + state->f.cy;
-        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
-        state->f.s = (0x80 == (result & 0x80));
-        state->f.cy = (result > 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-
-        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
-        break;
-
-    case 0x90:                                                               // SUB B
-        result = state->a + (~state->b) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->b > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x91:                                                               // SUB C
-        result = state->a + (~state->c) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->c > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x92:                                                               // SUB D
-        result = state->a + (~state->d) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->d > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x93:                                                               // SUB E
-        result = state->a + (~state->e) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->e > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x94:                                                               // SUB H
-        result = state->a + (~state->h) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->h > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x95:                                                               // SUB L
-        result = state->a + (~state->l) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->l > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x96: // SUB M
-        hl = (state->h << 8) | state->l;
-        result = state->a + (~state->mem[hl]) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->mem[hl] > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x97:                                                               // SUB A
-        result = state->a + (~state->a) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = 0;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x98:                                                                            // SBB B
-        result = state->a + (~state->b) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->b > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x99:                                                                            // SBB C
-        result = state->a + (~state->c) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->c > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x9A:                                                                            // SBB D
-        result = state->a + (~state->d) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->d > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x9B:                                                                            // SBB E
-        result = state->a + (~state->e) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->e > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x9C:                                                                            // SBB H
-        result = state->a + (~state->h) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->h > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x9D:                                                                            // SBB L
-        result = state->a + (~state->l) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->l > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x9E: // SBB M
-        hl = (state->h << 8) | state->l;
-        result = state->a + (~state->mem[hl]) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->mem[hl] > state->a;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0x9F:                                                                            // SBB A
-        result = state->a + (~state->a) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = 0;
-        state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
-        state->f.p = Parity(result & 0xFF);
-        state->a = result & 0xFF;
-        break;
-
-    case 0xA0:                      // ANA B
-        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
-        upperdec = state->b & 0x08; // Isolate bit 3 from AND register
-
-        state->f.cy = 0;                             // ANA clears carry
-        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
-        state->a = state->a & state->b;
-        state->f.z = 0 == state->a;
-        state->f.s = 0x80 == (state->a & 0x80);
-        state->f.p = Parity(state->a);
-        break;
-
-    case 0xA1:                      // ANA C
-        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
-        upperdec = state->c & 0x08; // Isolate bit 3 from AND register
-
-        state->f.cy = 0;                             // ANA clears carry
-        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
-        state->a = state->a & state->c;
-        state->f.z = 0 == state->a;
-        state->f.s = 0x80 == (state->a & 0x80);
-        state->f.p = Parity(state->a);
-        break;
-
-    case 0xA2:                      // ANA D
-        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
-        upperdec = state->d & 0x08; // Isolate bit 3 from AND register
-
-        state->f.cy = 0;                             // ANA clears carry
-        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
-        state->a = state->a & state->d;
-        state->f.z = 0 == state->a;
-        state->f.s = 0x80 == (state->a & 0x80);
-        state->f.p = Parity(state->a);
-        break;
-
-    case 0xA3:                      // ANA E
-        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
-        upperdec = state->e & 0x08; // Isolate bit 3 from AND register
-
-        state->f.cy = 0;                             // ANA clears carry
-        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
-        state->a = state->a & state->e;
-        state->f.z = 0 == state->a;
-        state->f.s = 0x80 == (state->a & 0x80);
-        state->f.p = Parity(state->a);
-        break;
-
+            state->sp -= 1;
+            break;
+
+        case 0x3C:
+            // INR A
+            state->a += 1;
+            result = state->a;
+            state->f = SetFlags(result);
+            break;
+
+        case 0x3D:
+            // DCR A
+            state->a -= 1;
+            result = state-> a;
+            state->f = SetFlags(result);
+            break;
+
+        case 0x3E:
+            // MVI A, 0x%02x, code[1] -- 2 opBytes
+            state->a = opcode[1];
+            state->pc += 1;
+            break;
+
+        case 0x3F:
+            // CMC
+            // Complement of the carry flag. Flips the carry bit of the flags register
+            state->f.cy = (!state->f.cy);
+            break;
+
+        case 0x40:
+            // MOV B, B
+            state->b = state->b;
+            break;
+
+        case 0x41:
+            // MOV B, C
+            state->b = state->c;
+            break;
+
+        case 0x42:
+            // MOV B, F
+            state->b = FlagCalc(state->f);
+            break;
+
+        case 0x43:
+            // MOV B, E
+            state->b = state->e;
+            break;
+
+        case 0x44:
+            // MOV B, H
+            state->b = state->h;
+            break;
+
+        case 0x45:
+            // MOV B, L
+            state->b = state->l;
+            break;
+
+        case 0x46:
+            // MOV B, M
+            hl = (state->h << 8) | state->l;
+            state->b = state->mem[hl];
+            break;
+
+        case 0x47:
+            // MOV B, A
+            state->b = state->a;
+            break;
+
+        case 0x48:
+            // MOV C, B
+            state->c = state->b;
+            break;
+
+        case 0x49:
+            // MOV C, C
+            state->c = state->c;
+            break;
+
+        case 0x4A:
+            // MOV C, D
+            state->c = state->d;
+            break;
+
+        case 0x4B:
+            // MOV C, E
+            state->c = state->e;
+            break;
+
+        case 0x4C:
+            // MOV C, H
+            state->c = state->h;
+            break;
+
+        case 0x4D:
+            // MOV C, L
+            state->c = state->l;
+            break;
+
+        case 0x4E:
+            // MOV C, M
+            hl = (state->h << 8) | state->l;
+            state->c = state->mem[hl];
+            break;
+
+        case 0x4F:
+            // MOV C, A
+            state->c = state->a;
+            break;
+
+        case 0x50:
+            state->d = state->b;
+            break;
+
+        case 0x51:
+            state->d = state->c;
+            break;
+
+        case 0x52:
+            // state->d = state->d; This operation does nothing MOV D, D
+            break;
+
+        case 0x53:
+            state->d = state->e;
+            break;
+
+        case 0x54:
+            state->d = state->h;
+            break;
+
+        case 0x55:
+            state->d = state->l;
+            break;
+
+        case 0x56:
+            // MOV D,M moves the number stored in the address at HL to register D
+            // shift H left by 8 bits and do an or operator with L
+            hl = (state->h<<8)| (state->l);
+            state->d = state->mem[hl];
+            break;
+
+        case 0x57:
+            state->d = state->a;
+            break;
+
+        case 0x58:
+            state->e = state->b;
+            break;
+
+        case 0x59:
+            state->e = state->c;
+            break;
+
+        case 0x5A:
+            state->e = state->d;
+            break;
+
+        case 0x5B:
+            // state->e = state->e; this code does nothing
+            break;
+
+        case 0x5C:
+            state->e = state->h;
+            break;
+
+        case 0x5D:
+            state->e = state->l;
+            break;
+
+        case 0x5E:
+            hl = (state->h<<8)|(state->l);
+            state->e = state->mem[hl];
+            break;
+
+        case 0x5F:
+            state->e = state->a;
+            break;
+
+        case 0x60:
+            state->h = state->b;
+            break;
+
+        case 0x61:
+            state->h = state->c;
+            break;
+
+        case 0x62:
+            state->h = state->d;
+            break;
+
+        case 0x63:
+            state->h = state->e;
+            break;
+
+        case 0x64:
+            state->h = state->h;
+            break;
+
+        case 0x65:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x66:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x67:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x68:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x69:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x6A:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x6B:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x6C:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x6D:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x6E:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x6F:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x70:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x71:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x72:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x73:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x74:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x75:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x76:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x77:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x78:
+            CPU::UnimplementedInstruction(state);
+            break;
+
+        case 0x79: //MOV A, C
+            state->a = state->c;
+            break;
+
+        case 0x7A: //MOV A, D
+            state->a = state->d;
+            break;
+
+        case 0x7B: //MOV A, E
+            state->a = state->e;
+            break;
+
+        case 0x7C: //MOV A, H
+            state->a = state->h;
+            break;
+
+        case 0x7D: //MOV A, L
+            state->a = state->l;
+            break;
+
+        case 0x7E: //MOV A, M
+            hl = (state->h << 8) | state->l;
+            state->a = state->mem[hl];
+            break;
+
+        case 0x7F: //MOV A, A
+            state->a = state->a;
+            break;
+
+        case 0x80: //ADD B
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->b & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->b;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x81: //ADD C
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->c & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->c;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x82: //ADD D
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->d & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->d;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x83: //ADD E
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->e & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->e;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x84: //ADD H
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->h & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->h;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x85: //ADD L
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->l & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->l;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x86: //ADD M
+            hl = (state->h << 8) | state->l;
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->mem[hl] & 0x0F; //Pulls mem value low 4 bit nibble
+
+            result = state->a + state->mem[hl];
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x87: //ADD A
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = state->a & 0x0F; //Pulls added register low 4 bit nibble
+
+            result = state->a + state->a;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x88: //ADC B
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->b & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->b + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x89: //ADC C
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->c & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->c + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x8A: //ADC D
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->d & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->d + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x8B: //ADC E
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->e & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->e + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x8C: //ADC H
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->h & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->h + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x8D: //ADC L
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->l & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->l + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x8E: //ADC M
+            hl = (state->h << 8) | state->l;
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->mem[hl] & 0x0F) + state->f.cy; //Pulls added mem low 4 bit nibble, adds CY value
+
+            result = state->a + state->mem[hl] + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x8F: //ADC A
+            lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
+            upperdec = (state->a & 0x0F) + state->f.cy; //Pulls added register low 4 bit nibble, adds CY value
+
+            result = state->a + state->a + state->f.cy;
+            state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+            state->f.s = (0x80 == (result & 0x80));
+            state->f.cy = (result > 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+
+            result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+            state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+            break;
+
+        case 0x90: //SUB B
+            result = state->a + (~state->b) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->b > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x91: //SUB C
+            result = state->a + (~state->c) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->c > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x92: //SUB D
+            result = state->a + (~state->d) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->d > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x93: //SUB E
+            result = state->a + (~state->e) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->e > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x94: //SUB H
+            result = state->a + (~state->h) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->h > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x95: //SUB L
+            result = state->a + (~state->l) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->l > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x96: //SUB M
+            hl = (state->h << 8) | state->l;
+            result = state->a + (~state->mem[hl]) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->mem[hl] > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x97: //SUB A
+            result = state->a + (~state->a) + 1; //2s complement subtraction
+            state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = 0;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x98: //SBB B
+            result = state->a + (~state->b) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->b > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x99: //SBB C
+            result = state->a + (~state->c) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->c > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x9A: //SBB D
+            result = state->a + (~state->d) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->d > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x9B: //SBB E
+            result = state->a + (~state->e) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->e > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x9C: //SBB H
+            result = state->a + (~state->h) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->h > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x9D: //SBB L
+            result = state->a + (~state->l) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->l > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x9E: //SBB M
+            hl = (state->h << 8) | state->l;
+            result = state->a + (~state->mem[hl]) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = state->mem[hl] > state->a;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0x9F: //SBB A
+            result = state->a + (~state->a) + (~state->f.cy); //2s complement subtraction, flips state of CY flag
+            state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + (~state->f.cy)) > 0x0F; //Apparently they don't bother flipping this
+            state->f.cy = 0;
+            state->f.s = 0x80 == (result & 0x80);
+            state->f.z = 0 == (result & 0xFF);
+            state->f.p = Parity(result & 0xFF);
+            state->a = result & 0xFF;
+            break;
+
+        case 0xA0: //ANA B
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->b & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->b;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
+            break;
+
+        case 0xA1: //ANA C
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->c & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->c;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
+            break;
+
+        case 0xA2: //ANA D
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->d & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->d;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
+            break;
+
+        case 0xA3: //ANA E
+            lowerdec = state->a & 0x08; //Isolate bit 3 from A register
+            upperdec = state->e & 0x08; //Isolate bit 3 from AND register
+
+            state->f.cy = 0; //ANA clears carry
+            state->f.ac = 0x08 == (lowerdec | upperdec); //AC flag set to OR of bit 3s from involved registers
+            state->a = state->a & state->e;
+            state->f.z = 0 == state->a;
+            state->f.s = 0x80 == (state->a & 0x80);
+            state->f.p = Parity(state->a);
+            break;
+        
     case 0xA4:
         CPU::UnimplementedInstruction(state);
         break;
