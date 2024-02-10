@@ -1418,6 +1418,7 @@ int CPU::Emulate8080Codes(State8080 *state){
                 state->mem[state->sp-2] = (result & 0xFF);
                 state->sp = state->sp - 2;
                 state->pc = (opcode[2] << 8) | opcode[1];
+                state->pc--;
             }
             else{
                 state->pc += 2;
