@@ -670,112 +670,83 @@ int CPU::Emulate8080Codes(State8080 *state){
             break;
 
         case 0x65:
-            //mov h,l
-            state->h = state->l;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x66:
-            //mov h,m
-            hl = (state->h<<8)|(state->l);
-            state->h = state->mem[hl];
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x67:
-            //mov h,a
-            state->h = state->a;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x68:
-            //mov l,b
-            state->l = state->b;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x69:
-            //mov l,c
-            state->l = state->c;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x6A:
-            //mov l,d
-            state->l = state->d;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x6B:
-            //mov l,e
-            state->l = state->e;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x6C:
-            //mov l,h
-            state->l = state->h;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x6D:
-            //mov l,l
-            state->l = state->l;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x6E:
-            //mov l,m
-            hl = (state->h<<8)|(state->l);
-            state->l = state->mem[hl];
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x6F:
-            //mov l,a
-            state->l = state->a;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x70:
-            //mov m,b  (hl)<-b
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->b;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x71:
-            //mov m,c  (hl)<-c
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->c;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x72:
-            //mov m,d  (hl)<-d
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->d;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x73:
-            //mov m,e  (hl)<-e
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->e;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x74:
-            //mov m,h   (hl)<-h
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->h;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x75:
-            //mov m,l  (hl)<-l
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->l;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x76:
-            //HLT      special
-            //FIXME;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x77:
-            //mov m,a  (hl)<-a     error in opcodes page?
-            hl = (state->h<<8)|(state->l);
-            state->mem[hl] = state->a;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x78:
-            //mov a,b    b<-a
-            state->a = state->b;
+            CPU::UnimplementedInstruction(state);
             break;
 
         case 0x79: //MOV A, C
