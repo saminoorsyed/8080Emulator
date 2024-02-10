@@ -1474,7 +1474,6 @@ int CPU::Emulate8080Codes(State8080 *state){
             if(!state->f.p){
                 state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
                 state->sp += 2;
-                state->pc --;
             }
             break;
 
@@ -1542,7 +1541,6 @@ int CPU::Emulate8080Codes(State8080 *state){
             if(state->f.p){
                 state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
                 state->sp += 2;
-                state->pc --;
             }
             break;
 
@@ -1613,7 +1611,6 @@ int CPU::Emulate8080Codes(State8080 *state){
             if(!state->f.s){
                 state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
                 state->sp += 2;
-                state->pc --;
             }
             break;
 
