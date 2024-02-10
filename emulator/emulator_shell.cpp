@@ -205,7 +205,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->d == 0;
         state->f.s = 0x80 == (state->d & 0x80);
         state->f.p = Parity(state->d);
-        state->f.ac = 1;
+        state->f.ac = (state->d & 0x0F) == 0x00; //Sets AC if lower nibble overflows
         break;
 
     case 0x15: // DCR D
@@ -213,7 +213,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->d == 0;
         state->f.s = 0x80 == (state->d & 0x80);
         state->f.p = Parity(state->d);
-        state->f.ac = 1;
+        state->f.ac = (state->d & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
         break;
 
     case 0x16: // MVI D, d8
@@ -265,7 +265,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->e == 0;
         state->f.s = 0x80 == (state->e & 0x80);
         state->f.p = Parity(state->e);
-        state->f.ac = 1;
+        state->f.ac = (state->e & 0x0F) == 0x00; //Sets AC if lower nibble overflows
         break;
 
     case 0x1D: // DCR E
@@ -273,7 +273,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->e == 0;
         state->f.s = 0x80 == (state->e & 0x80);
         state->f.p = Parity(state->e);
-        state->f.ac = 1;
+        state->f.ac = (state->e & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
         break;
 
     case 0x1E: // MVI E, d8
@@ -321,7 +321,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->h == 0;
         state->f.s = 0x80 == (state->h & 0x80);
         state->f.p = Parity(state->h);
-        state->f.ac = 1;
+        state->f.ac = (state->h & 0x0F) == 0x00; //Sets AC if lower nibble overflows
         break;
 
     case 0x25: // DCR H
@@ -329,7 +329,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->h == 0;
         state->f.s = 0x80 == (state->h & 0x80);
         state->f.p = Parity(state->h);
-        state->f.ac = 1;
+        state->f.ac = (state->h & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
         break;
 
     case 0x26: // MVI H, d8
