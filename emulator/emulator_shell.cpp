@@ -1640,6 +1640,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             break;
 
         case 0xF3:  // DI - this disables system interrupts and would need to be implemented alongside later code
+            // TODO
             CPU::UnimplementedInstruction(state);
             break;
 
