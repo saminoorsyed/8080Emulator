@@ -198,7 +198,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->f.z = state->d == 0;
             state->f.s = 0x80 == (state->d & 0x80);
             state->f.p = Parity(state->d);
-            state->f.ac = (state->d & 0x0F) == 0x00; //Sets AC if lower nibble overflows
+            state->f.ac = 1;
             break;
 
         case 0x15: //DCR D
@@ -206,7 +206,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->f.z = state->d == 0;
             state->f.s = 0x80 == (state->d & 0x80);
             state->f.p = Parity(state->d);
-            state->f.ac = (state->d & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
+            state->f.ac = 1;
             break;
 
         case 0x16: //MVI D, d8
@@ -266,7 +266,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->f.z = state->e == 0;
             state->f.s = 0x80 == (state->e & 0x80);
             state->f.p = Parity(state->e);
-            state->f.ac = (state->e & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
+            state->f.ac = 1;
             break;
 
         case 0x1E: //MVI E, d8
@@ -314,7 +314,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->f.z = state->h == 0;
             state->f.s = 0x80 == (state->h & 0x80);
             state->f.p = Parity(state->h);
-            state->f.ac = (state->h & 0x0F) == 0x00; //Sets AC if lower nibble overflows
+            state->f.ac = 1;
             break;
 
         case 0x25: //DCR H
@@ -322,7 +322,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->f.z = state->h == 0;
             state->f.s = 0x80 == (state->h & 0x80);
             state->f.p = Parity(state->h);
-            state->f.ac = (state->h & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
+            state->f.ac = 1;
             break;
 
         case 0x26: //MVI H, d8
@@ -1399,6 +1399,7 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xC2: //JNZ a16
             if(!(state->f.z)){
                 state->pc = (opcode[2] << 8) | opcode[1];
+                state->pc--;
             }
             else{
                 state->pc += 2;
@@ -1407,6 +1408,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xC3: //JMP a16
             state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc--;
             break;
 
         case 0xC4: //CNZ a16
@@ -1449,7 +1451,7 @@ int CPU::Emulate8080Codes(State8080 *state){
             state->mem[state->sp - 1] = (result >> 8);
             state->mem[state->sp -2] = (result & 0xFF);
             state->sp -= 2;
-            state->pc = 0x0000;
+            state->pc = 0xFFFF; //Set up to overflow to 0x0000 with end of statement increment
             break;
 
         case 0xC8: //RZ
@@ -1467,6 +1469,7 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xCA: //JZ a16
             if(state->f.z){
                 state->pc = (opcode[2] << 8) | opcode[1];
+                state->pc--;
             }
             else{
                 state->pc += 2;
@@ -1475,6 +1478,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xCB: //JMP a16
             state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc--;
             break;
 
         case 0xCC:
