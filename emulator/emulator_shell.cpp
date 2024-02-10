@@ -1405,6 +1405,7 @@ int CPU::Emulate8080Codes(State8080 *state)
             state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
             state->sp -= 2;
             state->pc = opcode[2] << 8 | opcode[1];
+            state->pc--;
         }
         else
         {
@@ -1418,6 +1419,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
         state->sp -= 2;                            // stack grows downward
         state->pc = (opcode[2] << 8) | opcode[1];  // Jump to the address immediately after the pc
+        state->pc--;
         break;
 
     case 0xCE:                                       // ACI d8
@@ -1433,6 +1435,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
         state->sp -= 2;                            // stack grows downward
         state->pc = 0x0008;                        // sets pc to 8 multiplied by the number associated with RST (8*1)
+        state->pc--;
         break;
 
     case 0xD0: // RNC
@@ -1455,6 +1458,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         {
             result = (opcode[2] << 8) | opcode[1]; // retrieve address from immediate data
             state->pc = result;                    // jump pc to address
+            state->pc--;
         }
         else
         {
@@ -1476,6 +1480,7 @@ int CPU::Emulate8080Codes(State8080 *state)
             state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
             state->sp -= 2;                            // stack grows downward
             state->pc = (opcode[2] << 8) | opcode[1];  // jump to addr in immediate data
+            state->pc--;
         }
         else
         {
@@ -1502,6 +1507,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
         state->pc = 0x0016;                        // sets pc to 8 multiplied by the number associated with RST (8*2)
+        state->pc--;
         break;
 
     case 0xD8: // RC
@@ -1524,6 +1530,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         {
             result = (opcode[2] << 8) | opcode[1];
             state->pc = result;
+            state->pc--;
         }
         else
         {
@@ -1543,6 +1550,7 @@ int CPU::Emulate8080Codes(State8080 *state)
             state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
             state->sp -= 2;                            // stack grows downward
             state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
+            state->pc--;
         }
         else
         {
@@ -1556,6 +1564,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
         state->sp -= 2;                            // stack grows downward
         state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
+        state->pc--;
         break;
 
     case 0xDE:                                              // SBI d8
@@ -1571,6 +1580,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
         state->pc = 0x0024;                        // sets pc to 8 multiplied by the number associated with RST (8*3)
+        state->pc--;
         break;
 
     case 0xE0:
