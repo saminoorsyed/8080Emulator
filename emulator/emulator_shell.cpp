@@ -1524,6 +1524,21 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xE6:  // ANI data code[1] - A and opcode[1]. Clears carry and aux carry flags
             state->a = state->a & opcode[1];
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             state->pc ++;
@@ -1594,6 +1609,21 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xEE:  // XRI data code[1] - exclusive or A with opcode[1]. Clears carry and aux carry flags
             state->a = state->a ^ opcode[1];
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             state->pc ++;
