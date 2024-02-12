@@ -844,7 +844,7 @@ int CPU::Emulate8080Codes(State8080 *state){
                 state->a += 6;
                 if (lowerdec > 15) state->f.ac = 1;
             }
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -869,7 +869,7 @@ int CPU::Emulate8080Codes(State8080 *state){
                 state->a += 6;
                 if (lowerdec > 15) state->f.ac = 1;
             }
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -895,7 +895,7 @@ int CPU::Emulate8080Codes(State8080 *state){
                 state->a += 6;
                 if (lowerdec > 15) state->f.ac = 1;
             }
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -920,7 +920,7 @@ int CPU::Emulate8080Codes(State8080 *state){
                 state->a += 6;
                 if (lowerdec > 15) state->f.ac = 1;
             }
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -940,7 +940,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xA8:  // XRA B
             state->a = state->a ^ state->b;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -961,7 +961,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xA9:  // XRA C
             state->a = state->a ^ state->c;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -982,7 +982,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xAA:  // XRA D
             state->a = state->a ^ state->d;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1003,7 +1003,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xAB:  // XRA E
             state->a = state->a ^ state->e;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1024,7 +1024,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xAC:  // XRA H
             state->a = state->a ^ state->h;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1045,7 +1045,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xAD:  // XRA L
             state->a = state->a ^ state->l;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1067,7 +1067,7 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xAE:  // XRA M
             hl = (state->h << 8) | state->l;
             state->a = state-> a ^ state->mem[hl];
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1088,7 +1088,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xAF:  // XRA A
             state->a = state->a ^ state->a;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1109,7 +1109,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB0:  // ORA B
             state->a = state->a | state->b;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1130,7 +1130,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB1:  // ORA C
             state->a = state->a | state->c;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1151,7 +1151,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB2:  // ORA D
             state->a = state->a | state->d;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1172,7 +1172,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB3:  // ORA E
             state->a = state->a | state->e;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1193,7 +1193,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB4:  // ORA H
             state->a = state->a | state->h;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1214,7 +1214,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB5:  // ORA L
             state->a = state->a | state->l;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1236,7 +1236,7 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xB6:  // ORA M
             hl = (state->h << 8) | state->l;
             state->a = state-> a | state->mem[hl];
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1257,7 +1257,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xB7:  // ORA A
             state->a = state->a | state->a;
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
