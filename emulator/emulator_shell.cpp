@@ -839,63 +839,227 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xA4:  // ANA H
             state->a = state->a & state->h;
+            lowerdec = state->a & 0x0F;
+            if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+                state->a += 6;
+                if (lowerdec > 15) state->f.ac = 1;
+            }
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
-            state->f.ac = 0;
             break;
 
         case 0xA5:  // ANA L
             state->a = state->a & state->l;
+            lowerdec = state->a & 0x0F;
+            if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+                state->a += 6;
+                if (lowerdec > 15) state->f.ac = 1;
+            }
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
-            state->f.ac = 0;
-            break;
-
             break;
 
         case 0xA6:  // ANA M
             hl = (state->h << 8) | state->l;
             state->a = state-> a & state->mem[hl];
+            lowerdec = state->a & 0x0F;
+            if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+                state->a += 6;
+                if (lowerdec > 15) state->f.ac = 1;
+            }
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
-            state->f.ac = 0;
             break;
 
-        case 0xA7:  // ANA A - this doesn't actually do anything except clear the cy and ac flags
+        case 0xA7:  // ANA A
             state->a = state->a & state->a;
+            lowerdec = state->a & 0x0F;
+            if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+                state->a += 6;
+                if (lowerdec > 15) state->f.ac = 1;
+            }
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
-            state->f.ac = 0;
             break;
 
         case 0xA8:  // XRA B
             state->a = state->a ^ state->b;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xA9:  // XRA C
             state->a = state->a ^ state->c;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xAA:  // XRA D
             state->a = state->a ^ state->d;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xAB:  // XRA E
             state->a = state->a ^ state->e;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xAC:  // XRA H
             state->a = state->a ^ state->h;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xAD:  // XRA L
             state->a = state->a ^ state->l;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
@@ -903,48 +1067,168 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xAE:  // XRA M
             hl = (state->h << 8) | state->l;
             state->a = state-> a ^ state->mem[hl];
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
-        case 0xAF:  // XRA A - this doesn't actually do anything except clear the cy and ac flags
+        case 0xAF:  // XRA A
             state->a = state->a ^ state->a;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB0:  // ORA B
             state->a = state->a | state->b;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB1:  // ORA C
             state->a = state->a | state->c;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB2:  // ORA D
             state->a = state->a | state->d;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB3:  // ORA E
             state->a = state->a | state->e;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB4:  // ORA H
             state->a = state->a | state->h;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB5:  // ORA L
             state->a = state->a | state->l;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
@@ -952,12 +1236,42 @@ int CPU::Emulate8080Codes(State8080 *state){
         case 0xB6:  // ORA M
             hl = (state->h << 8) | state->l;
             state->a = state-> a | state->mem[hl];
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
 
         case 0xB7:  // ORA A
             state->a = state->a | state->a;
+            if((state->a & (1 << 0)) >> 0 == 0){
+                state->f.p = 1; // set parity flag if 0th bit is 0
+            } else {
+                state->f.p = 0;
+            }
+            if(state->a == 0){
+                state->f.z = 1; // set zero flag if result is 0
+            } else {
+                state->f.z = 0;
+            }
+            if((state->a & (1 << 7)) >> 7 == 1){
+                state->f.s = 1; // set sign flag if most significant bit is set
+            } else {
+                state->f.s = 0;
+            }
             state->f.cy = 0;
             state->f.ac = 0;
             break;
