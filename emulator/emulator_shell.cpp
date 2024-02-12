@@ -1524,7 +1524,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xE6:  // ANI data code[1] - A and opcode[1]. Clears carry and aux carry flags
             state->a = state->a & opcode[1];
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
@@ -1609,7 +1609,7 @@ int CPU::Emulate8080Codes(State8080 *state){
 
         case 0xEE:  // XRI data code[1] - exclusive or A with opcode[1]. Clears carry and aux carry flags
             state->a = state->a ^ opcode[1];
-            if((state->a & (1 << 0)) >> 0 == 0){
+            if(Parity(state->a)){
                 state->f.p = 1; // set parity flag if 0th bit is 0
             } else {
                 state->f.p = 0;
