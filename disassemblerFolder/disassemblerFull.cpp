@@ -1,3 +1,13 @@
+// Date: Jan 22, 2024
+// Purpose: Disassembler for Space Invaders
+
+#include <fstream>
+#include <filesystem>
+
+using namespace std;
+namespace FileSystem = std::filesystem;
+
+
 int Disassemble8080Op(unsigned char *codebuffer, int pc)
 {
     // pointer to current place in the buffer
@@ -629,7 +639,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("PUSH    B");
         break;
     case 0xC6:
-        printf("ADI     data,   0x%02x", code[1]);
+        printf("ADI     data,   0x%02x",code[1]);
         opBytes = 2;
         break;
     case 0xC7:
@@ -835,4 +845,47 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
     printf("\n");
 
     return opBytes;
+}
+
+// argc = number of command line arguments
+// char **argv =  char *argv[] = list of command line arguments
+// argv[0] = name of the program, argv[1] = first arg called after file name
+// call the function with the file you want to read
+int main(int argc, char**argv)
+{
+    // Code for the main function
+    // Read the code into a buffer r = read, b = binary
+    // Get a pointer to the beginning of the buffer
+    FILE *f;
+    FileSystem::path romPath = "../ROM/invaders";
+    string filepath = FileSystem::absolute(romPath).string();
+    const char* rawFilePath = filepath.c_str();
+#ifdef _WIN32
+    errno_t err = fopen_s(&f, rawFilePath, "rb");
+#else
+    f = fopen(rawFilePath, "r");
+#endif
+    if (f==NULL){
+        printf("error: Could not open %s\n", rawFilePath);
+        exit(1);
+    }
+    
+    // find the end of the file 0L = offset from end of file to stop at
+    fseek(f, 0L, SEEK_END);
+    int fSize = ftell(f); // store location of file pointer
+    fseek(f, 0L, SEEK_SET); //move the pointer back to the beginning
+
+    // Use the byte at the pointer to determine the opcode
+    auto *buffer = (unsigned char *)malloc(fSize);
+    fread(buffer, fSize, 1,f);
+    fclose(f);
+
+    // Print out the name of the opcode using the bytes after the opcode as data
+    int pc = 0;
+    while (pc <fSize){
+        // advance the pointer the length of the returned opcode
+        pc+=Disassemble8080Op(buffer,pc);
+    }
+
+    return 0; // Indicates successful execution
 }
