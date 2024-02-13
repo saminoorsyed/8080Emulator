@@ -49,14 +49,3 @@ public:
     bool IsAuxFlagSet(uint16_t number);
   
 };
-
-void Free8080(u_int8_t* mem_address)
-{
-    if (mem_address != nullptr)
-    {
-      
-        free(mem_address);
-        mem_address = nullptr; // Set pointer to null to avoid dangling pointer
-    }
-    free(mem_address);
-}

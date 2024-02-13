@@ -6,16 +6,16 @@ namespace FileSystem = std::filesystem;
 
 #include "emulator_shell.h" 
 
-void ReadFileIntoMemoryAt(CPU::State8080 *state, char *filename, uint32_t offset)
+void ReadFileIntoMemoryAt(CPU::State8080 *state, const char *filename, uint32_t offset)
 {
     FILE *f;
-    FileSystem::path romPath = "../ROM/invaders";
-    string filepath = FileSystem::absolute(romPath).string();
-    const char *rawFilePath = filepath.c_str();
+    std::filesystem::path romPath = filename;
+    const char *rawFilePath = romPath.c_str();
+    const char* mode = "rb";
 #ifdef _WIN32
-    errno_t err = fopen_s(&f, filename, "rb");
+    errno_t err = fopen_s(&f, rawFilePath, mode);
 #else
-    f = fopen(filename, "rb");
+    f = fopen(rawFilePath, mode);
 #endif
     if (f == NULL)
     {
@@ -32,11 +32,14 @@ void ReadFileIntoMemoryAt(CPU::State8080 *state, char *filename, uint32_t offset
 }
 
 CPU::State8080 *Init8080(void)
-{
+{   
+    // allocate initialized data for cpu state
     CPU::State8080 *state = (CPU::State8080*)calloc(1, sizeof(CPU::State8080));
+    // point state->mem toward 16k of memory
     state->mem = (u_int8_t*)malloc(0x10000); // 16K
     return state;
 }
+
 
 int main(int argc, char **argv)
 {
@@ -44,15 +47,17 @@ int main(int argc, char **argv)
     CPU::State8080 *state = Init8080();
     // store the beginning of the memory for state
     u_int8_t* mem_start = state->mem;
+    // load the rom files into memory
     ReadFileIntoMemoryAt(state, "../ROM/invaders.h", 0);
     ReadFileIntoMemoryAt(state, "../ROM/invaders.g", 0x800);
     ReadFileIntoMemoryAt(state, "../ROM/invaders.f", 0x1000);
     ReadFileIntoMemoryAt(state, "../ROM/invaders.e", 0x1800);
+    // we need an instance of CPU to call the Emulator8080 codes 
     CPU cpu_instance;
     while (done == 0)
     {
         done = cpu_instance.Emulate8080Codes(state);
     }
-    Free8080(mem_start);
+    free(mem_start);
     return 0;
 }
