@@ -1,5 +1,7 @@
 #include <iostream>
 #include "emulator_shell.h"
+#include "emulator_shell.h"
+#include "disassembler.h"
 
 using namespace std;
 
@@ -68,6 +70,8 @@ bool CPU::IsAuxFlagSet(uint16_t number)
 int CPU::Emulate8080Codes(State8080 *state)
 {
     unsigned char *opcode = &state->mem[state->pc];
+    // print the opcode before executing
+    Disassemble8080Op(state->mem, state->pc);
     uint32_t result;
     uint8_t upperdec;
     uint8_t lowerdec;
@@ -2340,6 +2344,12 @@ int CPU::Emulate8080Codes(State8080 *state)
     }
     (state->pc)++;
 
+    // print out the processor state, flags and registers after execution
+    printf("\tC=%d,P=%d,S=%d,Z=%d\n", state->f.cy, state->f.p,
+           state->f.s, state->f.z);
+    printf("\tA $%02x B $%02x C $%02x D $%02x E $%02x H $%02x L $%02x SP %04x\n",
+           state->a, state->b, state->c, state->d,
+           state->e, state->h, state->l, state->sp);
     // Potentially short term return, expect failed cases will return 1?
     return 0;
 }
