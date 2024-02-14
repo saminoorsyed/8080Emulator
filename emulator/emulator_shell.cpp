@@ -680,85 +680,115 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->h = state->h;
         break;
 
-    case 0x65:
-        CPU::UnimplementedInstruction(state);
-        break;
+      case 0x65:
+            //mov h,l
+            state->h = state->l;
+            break;
 
-    case 0x66:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x66:
+            //mov h,m
+            hl = (state->h<<8)|(state->l);
+            state->h = state->mem[hl];
+            break;
 
-    case 0x67:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x67:
+            //mov h,a
+            state->h = state->a;
+            break;
 
-    case 0x68:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x68:
+            //mov l,b
+            state->l = state->b;
+            break;
 
-    case 0x69:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x69:
+            //mov l,c
+            state->l = state->c;
+            break;
 
-    case 0x6A:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x6A:
+            //mov l,d
+            state->l = state->d;
+            break;
 
-    case 0x6B:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x6B:
+            //mov l,e
+            state->l = state->e;
+            break;
 
-    case 0x6C:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x6C:
+            //mov l,h
+            state->l = state->h;
+            break;
 
-    case 0x6D:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x6D:
+            //mov l,l
+            state->l = state->l;
+            break;
 
-    case 0x6E:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x6E:
+            //mov l,m
+            hl = (state->h<<8)|(state->l);
+            state->l = state->mem[hl];
+            break;
 
-    case 0x6F:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x6F:
+            //mov l,a
+            state->l = state->a;
+            break;
 
-    case 0x70:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x70:
+            //mov m,b  (hl)<-b
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->b;
+            break;
 
-    case 0x71:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x71:
+            //mov m,c  (hl)<-c
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->c;
+            break;
 
-    case 0x72:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x72:
+            //mov m,d  (hl)<-d
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->d;
+            break;
 
-    case 0x73:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x73:
+            //mov m,e  (hl)<-e
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->e;
+            break;
 
-    case 0x74:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x74:
+            //mov m,h   (hl)<-h
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->h;
+            break;
 
-    case 0x75:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x75:
+            //mov m,l  (hl)<-l
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->l;
+            break;
 
-    case 0x76:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x76:
+            //HLT      special
+            //FIXME;
+            break;
 
-    case 0x77:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x77:
+            //mov m,a  (hl)<-a     error in opcodes page?
+            hl = (state->h<<8)|(state->l);
+            state->mem[hl] = state->a;
+            break;
 
-    case 0x78:
-        CPU::UnimplementedInstruction(state);
-        break;
+        case 0x78:
+            //mov a,b    b<-a
+            state->a = state->b;
+            break;
+
 
     case 0x79: // MOV A, C
         state->a = state->c;
@@ -2282,9 +2312,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         else
         {
             state->pc += 2;
-        }
-        break;
-
+      
     case 0xE5: // PUSH H
         state->mem[state->sp - 1] = state->h;
         state->mem[state->sp - 2] = state->l;
