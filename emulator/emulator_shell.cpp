@@ -2234,52 +2234,108 @@ int CPU::Emulate8080Codes(State8080 *state)
         CPU::UnimplementedInstruction(state);
         break;
 
-    case 0xF4:
+    case 0xF4: // CP adr
+        if (state->f.s == 0)
+        {
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc -= 1;
+        }
+        else
+        {
+            state->pc += 2;
+        }
+        break;
+
+    case 0xF5: // PUSH PSW
+        state->mem[state->sp - 2] = FlagCalc(state->f);
+        state->mem[state->sp - 1] = state->a;
+        state->sp -= 2;
+        break;
+
+    case 0xF6: // ORI D8 (carry bit reset to zero, Zero, Sign, and Parity set)
+        state->a = state->a | opcode[1];
+        state->f.cy = 0;
+        state->f.ac = 0;
+        state->f.s = 0x80 == (state->a & 0x80);
+        state->f.z = 0 == (state->a & 0xFF);
+        state->f.p = Parity(state->a & 0xFF);
+        state->pc += 1;
+        break;
+
+    case 0xF7: // RST 6
+        result = state->pc;                        // Store the address of the next instruction on the stack
+        state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
+        state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
+        state->sp -= 2;                            // stack grows downward
+        state->pc = 8 * 6;                        // sets pc to 8 multiplied by the number associated with RST (8*6)
+        state->pc--;
+        break;
+
+    case 0xF8: // RM
+        if (state->f.s) // if sign flag set. Perform RET which pops stack into program counter
+        {
+            state->pc = (state->mem[state->sp + 1] << 8) | state->mem[state->sp];                                               // Jump to the return address
+            state->sp += 2;
+        }
+        break;
+
+    case 0xF9: // SPHL
+        hl = (state->h << 8) | state->l;
+        state->sp = hl;
+        break;
+
+    case 0xFA: // JM adr (jump if minus)
+        if (state->f.s)
+        {
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc--;
+        }
+        else
+        {
+            state->pc += 2;
+        }
+        break;
+
+    case 0xFB: // EI (TODO - Special)
         CPU::UnimplementedInstruction(state);
         break;
 
-    case 0xF5:
-        CPU::UnimplementedInstruction(state);
+    case 0xFC: // CM adr (CALL if minus)
+        if (state->f.s)
+        {
+            result = state->pc + 2;
+            state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
+            state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
+            state->sp -= 2;                            // stack grows downward
+            state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
+            state->pc--;
+        }
+        else
+        {
+            state->pc += 2;
+        }
         break;
 
-    case 0xF6:
-        CPU::UnimplementedInstruction(state);
+    case 0xFD: // NOP
         break;
 
-    case 0xF7:
-        CPU::UnimplementedInstruction(state);
+    case 0xFE: // CPI D8 - Subtract data from accumulator, set flags with result
+        result = state->a - opcode[1];
+        state->f.cy = result > 0xff;
+        state->f.ac = (result & 0x0F) == 0x0F;
+        state->f.s = 0x80 == (result & 0x80);
+        state->f.z = 0 == (result & 0xFF);
+        state->f.p = Parity(result & 0xFF);
+        state->pc += 1;
         break;
 
-    case 0xF8:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xF9:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xFA:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xFB:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xFC:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xFD:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xFE:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xFF:
-        CPU::UnimplementedInstruction(state);
+    case 0xFF: // RST 7
+        result = state->pc;                        // Store the address of the next instruction on the stack
+        state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
+        state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
+        state->sp -= 2;                            // stack grows downward
+        state->pc = 8 * 7;                        // sets pc to 8 multiplied by the number associated with RST (8*7)
+        state->pc--;
         break;
     }
     (state->pc)++;
