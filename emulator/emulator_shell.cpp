@@ -1647,8 +1647,6 @@ int CPU::Emulate8080Codes(State8080 *state)
         else
         {
             state->pc += 2;
-        }
-        break;
 
     case 0xDD:                                     //*Call a16
         result = state->pc + 2;                    // push the address of the next instruction to the stack
@@ -1675,83 +1673,204 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->pc--;
         break;
 
-    case 0xE0:
-        CPU::UnimplementedInstruction(state);
+    case 0xE0:  // RPO - Return if parity flag is odd (cleared)
+        if(!state->f.p){
+            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+            state->sp += 2;
+        }
         break;
 
-    case 0xE1:
-        CPU::UnimplementedInstruction(state);
+    case 0xE1:  //  POP H
+        state->l = state->mem[state->sp];
+        state->h = state->mem[state->sp+1];
+        state->sp += 2;
         break;
 
-    case 0xE2:
-        CPU::UnimplementedInstruction(state);
+    case 0xE2:  // JPO adr code[2], code[1] - Jump if party flag is odd (cleared)
+        if(!state->f.p){
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc --;
+        }
+        else{
+            state->pc += 2;
+        }
         break;
 
-    case 0xE3:
-        CPU::UnimplementedInstruction(state);
+    case 0xE3:  // XTHL - exchange thing at sp with l and thing at sp+1 with h
+        result = state->l;
+        state->l = state->mem[state->sp];
+        state->mem[state->sp] = result;
+        result = state->h;
+        state->h = state->mem[state->sp+1];
+        state->mem[state->sp+1] = result;
         break;
 
-    case 0xE4:
-        CPU::UnimplementedInstruction(state);
+    case 0xE4:  // CPO adr code[2], code[1] - call if parity flag even
+        if(!state->f.p){
+            result = state->pc + 2;
+            state->mem[state->sp-1] = (result >> 8) & 0xFF;
+            state->mem[state->sp-2] = (result & 0xFF);
+            state->sp = state->sp - 2;
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc --;
+        }
+        else{
+            state->pc += 2;
+        }
         break;
 
-    case 0xE5:
-        CPU::UnimplementedInstruction(state);
+    case 0xE5:  // PUSH H
+        state->mem[state->sp-1] = state->h;
+        state->mem[state->sp-2] = state->l;
+        state->sp = state->sp -2;
         break;
 
-    case 0xE6:
-        CPU::UnimplementedInstruction(state);
+    case 0xE6:  // ANI data code[1] - A and opcode[1]. Clears carry and aux carry flags
+        state->a = state->a & opcode[1];
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
+        state->pc ++;
+        break;
+ 
+    case 0xE7:  // RST 4 - transfer control to address 8 * 4
+        state->mem[state->sp-1] = state->pc >> 8;
+        state->mem[state->sp-2] = state->pc & 0xff;
+        state->sp = state->sp-2;
+        state->pc = 8 * 4;
+        state->pc --;
         break;
 
-    case 0xE7:
-        CPU::UnimplementedInstruction(state);
+    case 0xE8:  // RPE - Return if parity equal
+        if(state->f.p){
+            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+            state->sp += 2;
+        }
         break;
 
-    case 0xE8:
-        CPU::UnimplementedInstruction(state);
+    case 0xE9:  // PCHL - Jump H and L indirect. Moves H and L to PC
+        hl = (state->h << 8) | state->l;
+        state->pc = hl;
+        state->pc --;           // decrement control pointer so it stays at hl
         break;
 
-    case 0xE9:
-        CPU::UnimplementedInstruction(state);
+    case 0xEA:  // JPE adr code[2], code[1] - jump if parity equal
+        if(state->f.p){
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc --;
+        }
+        else{
+            state->pc += 2;
+        }
         break;
 
-    case 0xEA:
-        CPU::UnimplementedInstruction(state);
+    case 0xEB:  // XCHG - exchange d & e with h & l registers
+        result = state->h;
+        state->h = state->d;
+        state->d = result;
+        result = state->l;
+        state->l = state->e;
+        state->e = result;
         break;
 
-    case 0xEB:
-        CPU::UnimplementedInstruction(state);
+    case 0xEC:  // CPE adr code[2], code[1] - call if parity flag even
+        if(state->f.p){
+            result = state->pc + 2;
+            state->mem[state->sp-1] = (result >> 8) & 0xFF;
+            state->mem[state->sp-2] = (result & 0xFF);
+            state->sp = state->sp - 2;
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc --;
+        }
+        else{
+            state->pc += 2;
+        }
         break;
 
-    case 0xEC:
-        CPU::UnimplementedInstruction(state);
+    case 0xED:  // CALL adr code[2], code[1]
+        result = state->pc + 2;
+        state->mem[state->sp-1] = (result >> 8) & 0xFF;
+        state->mem[state->sp-2] = (result & 0xFF);
+        state->sp = state->sp - 2;
+        state->pc = (opcode[2] << 8) | opcode[1];
+        state->pc --;
         break;
 
-    case 0xED:
-        CPU::UnimplementedInstruction(state);
+    case 0xEE:  // XRI data code[1] - exclusive or A with opcode[1]. Clears carry and aux carry flags
+        state->a = state->a ^ opcode[1];
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
+        state->pc ++;
         break;
 
-    case 0xEE:
-        CPU::UnimplementedInstruction(state);
+    case 0xEF:  // RST 5 - transfer control to address 8 * 5
+        state->mem[state->sp-1] = state->pc >> 8;
+        state->mem[state->sp-2] = state->pc & 0xff;
+        state->sp = state->sp-2;
+        state->pc = 8 * 5;
+        state->pc --;
         break;
 
-    case 0xEF:
-        CPU::UnimplementedInstruction(state);
+    case 0xF0:  // RP - return if positive (sign flag is cleared)
+        if(!state->f.s){
+            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+            state->sp += 2;
+        }
         break;
 
-    case 0xF0:
-        CPU::UnimplementedInstruction(state);
+    case 0xF1:  // POP PSW
+        // Contents of memory location pointed at by SP is used to restore condition flags.
+        // cy is 0th bit, p 2nd, ac 4th, z 6th, and s 7th.
+        state->f.cy = (state->mem[state->sp] & (1 << 0)) >> 0;
+        state->f.p = (state->mem[state->sp] & (1 << 2)) >> 2;
+        state->f.ac = (state->mem[state->sp] & (1 << 4)) >> 4;
+        state->f.z = (state->mem[state->sp] & (1 << 6)) >> 6;
+        state->f.s = (state->mem[state->sp] & (1 << 7)) >> 7;
+        state->a = state->mem[state->sp+1];     // Then the datasheet says to do this
+        state->sp = state->sp+2;
         break;
 
-    case 0xF1:
-        CPU::UnimplementedInstruction(state);
+    case 0xF2:  // JP adr code[1], code[1] - jump if positive (sign flag is cleared)
+        if(!state->f.s){
+            state->pc = (opcode[2] << 8) | opcode[1];
+            state->pc --;
+        }
+        else{
+            state->pc += 2;
+        }
         break;
 
-    case 0xF2:
-        CPU::UnimplementedInstruction(state);
-        break;
-
-    case 0xF3:
+    case 0xF3:  // DI - this disables system interrupts and would need to be implemented alongside later code
+        // TODO
         CPU::UnimplementedInstruction(state);
         break;
 
