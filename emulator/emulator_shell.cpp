@@ -1237,84 +1237,443 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.p = Parity(state->a);
         break;
 
-    case 0xA4:
-        CPU::UnimplementedInstruction(state);
+    case 0xA4:  // ANA H
+        state->a = state->a & state->h;
+        lowerdec = state->a & 0x0F;
+        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+            state->a += 6;
+            if (lowerdec > 15) state->f.ac = 1;
+        }
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
         break;
 
-    case 0xA5:
-        CPU::UnimplementedInstruction(state);
+    case 0xA5:  // ANA L
+        state->a = state->a & state->l;
+        lowerdec = state->a & 0x0F;
+        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+            state->a += 6;
+            if (lowerdec > 15) state->f.ac = 1;
+        }
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
         break;
 
-    case 0xA6:
-        CPU::UnimplementedInstruction(state);
+    case 0xA6:  // ANA M
+        hl = (state->h << 8) | state->l;
+        state->a = state-> a & state->mem[hl];
+        lowerdec = state->a & 0x0F;
+        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+            state->a += 6;
+            if (lowerdec > 15) state->f.ac = 1;
+        }
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
         break;
 
-    case 0xA7:
-        CPU::UnimplementedInstruction(state);
+    case 0xA7:  // ANA A
+        state->a = state->a & state->a;
+        lowerdec = state->a & 0x0F;
+        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+            state->a += 6;
+            if (lowerdec > 15) state->f.ac = 1;
+        }
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
         break;
 
-    case 0xA8:
-        CPU::UnimplementedInstruction(state);
+    case 0xA8:  // XRA B
+        state->a = state->a ^ state->b;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xA9:
-        CPU::UnimplementedInstruction(state);
+    case 0xA9:  // XRA C
+        state->a = state->a ^ state->c;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xAA:
-        CPU::UnimplementedInstruction(state);
+    case 0xAA:  // XRA D
+        state->a = state->a ^ state->d;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xAB:
-        CPU::UnimplementedInstruction(state);
+    case 0xAB:  // XRA E
+        state->a = state->a ^ state->e;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xAC:
-        CPU::UnimplementedInstruction(state);
+    case 0xAC:  // XRA H
+        state->a = state->a ^ state->h;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xAD:
-        CPU::UnimplementedInstruction(state);
+    case 0xAD:  // XRA L
+        state->a = state->a ^ state->l;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xAE:
-        CPU::UnimplementedInstruction(state);
+    case 0xAE:  // XRA M
+        hl = (state->h << 8) | state->l;
+        state->a = state-> a ^ state->mem[hl];
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xAF:
-        CPU::UnimplementedInstruction(state);
+    case 0xAF:  // XRA A
+        state->a = state->a ^ state->a;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB0:
-        CPU::UnimplementedInstruction(state);
+    case 0xB0:  // ORA B
+        state->a = state->a | state->b;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB1:
-        CPU::UnimplementedInstruction(state);
+    case 0xB1:  // ORA C
+        state->a = state->a | state->c;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB2:
-        CPU::UnimplementedInstruction(state);
+    case 0xB2:  // ORA D
+        state->a = state->a | state->d;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB3:
-        CPU::UnimplementedInstruction(state);
+    case 0xB3:  // ORA E
+        state->a = state->a | state->e;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB4:
-        CPU::UnimplementedInstruction(state);
+    case 0xB4:  // ORA H
+        state->a = state->a | state->h;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB5:
-        CPU::UnimplementedInstruction(state);
+    case 0xB5:  // ORA L
+        state->a = state->a | state->l;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB6:
-        CPU::UnimplementedInstruction(state);
+    case 0xB6:  // ORA M
+        hl = (state->h << 8) | state->l;
+        state->a = state-> a | state->mem[hl];
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
-    case 0xB7:
-        CPU::UnimplementedInstruction(state);
+    case 0xB7:  // ORA A
+        state->a = state->a | state->a;
+        if(Parity(state->a)){
+            state->f.p = 1; // set parity flag if 0th bit is 0
+        } else {
+            state->f.p = 0;
+        }
+        if(state->a == 0){
+            state->f.z = 1; // set zero flag if result is 0
+        } else {
+            state->f.z = 0;
+        }
+        if((state->a & (1 << 7)) >> 7 == 1){
+            state->f.s = 1; // set sign flag if most significant bit is set
+        } else {
+            state->f.s = 0;
+        }
+        state->f.cy = 0;
+        state->f.ac = 0;
         break;
 
     case 0xB8: //CMP B
@@ -1647,6 +2006,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         else
         {
             state->pc += 2;
+            break;
 
     case 0xDD:                                     //*Call a16
         result = state->pc + 2;                    // push the address of the next instruction to the stack
