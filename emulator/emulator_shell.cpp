@@ -209,7 +209,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->d == 0;
         state->f.s = 0x80 == (state->d & 0x80);
         state->f.p = Parity(state->d);
-        state->f.ac = (state->d & 0x0F) == 0x00; //Sets AC if lower nibble overflows
+        state->f.ac = (state->d & 0x0F) == 0x00; // Sets AC if lower nibble overflows
         break;
 
     case 0x15: // DCR D
@@ -217,7 +217,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->d == 0;
         state->f.s = 0x80 == (state->d & 0x80);
         state->f.p = Parity(state->d);
-        state->f.ac = (state->d & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
+        state->f.ac = (state->d & 0x0F) == 0x0F; // Sets AC if lower nibble has to borrow from bit 4
         break;
 
     case 0x16: // MVI D, d8
@@ -269,7 +269,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->e == 0;
         state->f.s = 0x80 == (state->e & 0x80);
         state->f.p = Parity(state->e);
-        state->f.ac = (state->e & 0x0F) == 0x00; //Sets AC if lower nibble overflows
+        state->f.ac = (state->e & 0x0F) == 0x00; // Sets AC if lower nibble overflows
         break;
 
     case 0x1D: // DCR E
@@ -277,7 +277,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->e == 0;
         state->f.s = 0x80 == (state->e & 0x80);
         state->f.p = Parity(state->e);
-        state->f.ac = (state->e & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
+        state->f.ac = (state->e & 0x0F) == 0x0F; // Sets AC if lower nibble has to borrow from bit 4
         break;
 
     case 0x1E: // MVI E, d8
@@ -325,7 +325,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->h == 0;
         state->f.s = 0x80 == (state->h & 0x80);
         state->f.p = Parity(state->h);
-        state->f.ac = (state->h & 0x0F) == 0x00; //Sets AC if lower nibble overflows
+        state->f.ac = (state->h & 0x0F) == 0x00; // Sets AC if lower nibble overflows
         break;
 
     case 0x25: // DCR H
@@ -333,7 +333,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.z = state->h == 0;
         state->f.s = 0x80 == (state->h & 0x80);
         state->f.p = Parity(state->h);
-        state->f.ac = (state->h & 0x0F) == 0x0F; //Sets AC if lower nibble has to borrow from bit 4
+        state->f.ac = (state->h & 0x0F) == 0x0F; // Sets AC if lower nibble has to borrow from bit 4
         break;
 
     case 0x26: // MVI H, d8
@@ -1241,613 +1241,809 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.p = Parity(state->a);
         break;
 
-    case 0xA4:  // ANA H
+    case 0xA4: // ANA H
         state->a = state->a & state->h;
         lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+        if (lowerdec > 9 || state->f.ac == 1)
+        { // aux carry logic
             state->a += 6;
-            if (lowerdec > 15) state->f.ac = 1;
+            if (lowerdec > 15)
+                state->f.ac = 1;
         }
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         break;
 
-    case 0xA5:  // ANA L
+    case 0xA5: // ANA L
         state->a = state->a & state->l;
         lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+        if (lowerdec > 9 || state->f.ac == 1)
+        { // aux carry logic
             state->a += 6;
-            if (lowerdec > 15) state->f.ac = 1;
+            if (lowerdec > 15)
+                state->f.ac = 1;
         }
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         break;
 
-    case 0xA6:  // ANA M
+    case 0xA6: // ANA M
         hl = (state->h << 8) | state->l;
-        state->a = state-> a & state->mem[hl];
+        state->a = state->a & state->mem[hl];
         lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+        if (lowerdec > 9 || state->f.ac == 1)
+        { // aux carry logic
             state->a += 6;
-            if (lowerdec > 15) state->f.ac = 1;
+            if (lowerdec > 15)
+                state->f.ac = 1;
         }
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         break;
 
-    case 0xA7:  // ANA A
+    case 0xA7: // ANA A
         state->a = state->a & state->a;
         lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1){  // aux carry logic
+        if (lowerdec > 9 || state->f.ac == 1)
+        { // aux carry logic
             state->a += 6;
-            if (lowerdec > 15) state->f.ac = 1;
+            if (lowerdec > 15)
+                state->f.ac = 1;
         }
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         break;
 
-    case 0xA8:  // XRA B
+    case 0xA8: // XRA B
         state->a = state->a ^ state->b;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xA9:  // XRA C
+    case 0xA9: // XRA C
         state->a = state->a ^ state->c;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xAA:  // XRA D
+    case 0xAA: // XRA D
         state->a = state->a ^ state->d;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xAB:  // XRA E
+    case 0xAB: // XRA E
         state->a = state->a ^ state->e;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xAC:  // XRA H
+    case 0xAC: // XRA H
         state->a = state->a ^ state->h;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xAD:  // XRA L
+    case 0xAD: // XRA L
         state->a = state->a ^ state->l;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xAE:  // XRA M
+    case 0xAE: // XRA M
         hl = (state->h << 8) | state->l;
-        state->a = state-> a ^ state->mem[hl];
-        if(Parity(state->a)){
+        state->a = state->a ^ state->mem[hl];
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xAF:  // XRA A
+    case 0xAF: // XRA A
         state->a = state->a ^ state->a;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB0:  // ORA B
+    case 0xB0: // ORA B
         state->a = state->a | state->b;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB1:  // ORA C
+    case 0xB1: // ORA C
         state->a = state->a | state->c;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB2:  // ORA D
+    case 0xB2: // ORA D
         state->a = state->a | state->d;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB3:  // ORA E
+    case 0xB3: // ORA E
         state->a = state->a | state->e;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB4:  // ORA H
+    case 0xB4: // ORA H
         state->a = state->a | state->h;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB5:  // ORA L
+    case 0xB5: // ORA L
         state->a = state->a | state->l;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB6:  // ORA M
+    case 0xB6: // ORA M
         hl = (state->h << 8) | state->l;
-        state->a = state-> a | state->mem[hl];
-        if(Parity(state->a)){
+        state->a = state->a | state->mem[hl];
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB7:  // ORA A
+    case 0xB7: // ORA A
         state->a = state->a | state->a;
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
         break;
 
-    case 0xB8: //CMP B
-        result = state->a + (~state->b) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xB8:                                                               // CMP B
+        result = state->a + (~state->b) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->b > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xB9: //CMP C
-        result = state->a + (~state->c) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xB9:                                                               // CMP C
+        result = state->a + (~state->c) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->c > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xBA: //CMP D
-        result = state->a + (~state->d) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xBA:                                                               // CMP D
+        result = state->a + (~state->d) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->d > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xBB: //CMP E
-        result = state->a + (~state->b) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xBB:                                                               // CMP E
+        result = state->a + (~state->b) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->b > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xBC: //CMP H
-        result = state->a + (~state->h) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xBC:                                                               // CMP H
+        result = state->a + (~state->h) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->h > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xBD: //CMP L
-        result = state->a + (~state->l) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xBD:                                                               // CMP L
+        result = state->a + (~state->l) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->l > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xBE: //CMP M
+    case 0xBE: // CMP M
         hl = (state->h << 8) | state->l;
-        result = state->a + (~state->mem[hl]) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+        result = state->a + (~state->mem[hl]) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = state->mem[hl] > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xBF: //CMP A
-        result = state->a + (~state->a) + 1; //2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + 1) > 0x0F; //Apparently they don't bother flipping this
+    case 0xBF:                                                               // CMP A
+        result = state->a + (~state->a) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
         state->f.cy = 0;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         break;
 
-    case 0xC0: //RNZ
-        if(!(state->f.z)){
-            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+    case 0xC0: // RNZ
+        if (!(state->f.z))
+        {
+            state->pc = state->mem[state->sp] | (state->mem[state->sp + 1] << 8);
             state->sp += 2;
         }
         break;
 
-    case 0xC1: //POP B
+    case 0xC1: // POP B
         state->c = state->mem[state->sp];
-        state->b = state->mem[state->sp+1];
+        state->b = state->mem[state->sp + 1];
         state->sp += 2;
         break;
 
-    case 0xC2: //JNZ a16
-        if(!(state->f.z)){
+    case 0xC2: // JNZ a16
+        if (!(state->f.z))
+        {
             state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xC3: //JMP a16
+    case 0xC3: // JMP a16
         state->pc = (opcode[2] << 8) | opcode[1];
         state->pc--;
         break;
 
-    case 0xC4: //CNZ a16
-        if(!(state->f.z)){
+    case 0xC4: // CNZ a16
+        if (!(state->f.z))
+        {
             result = state->pc + 2;
-            state->mem[state->sp-1] = (result >> 8) & 0xFF;
-            state->mem[state->sp-2] = (result & 0xFF);
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
             state->sp = state->sp - 2;
             state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xC5: //PUSH B
-        state->mem[state->sp-1] = state->b;
-        state->mem[state->sp-2] = state->c;
+    case 0xC5: // PUSH B
+        state->mem[state->sp - 1] = state->b;
+        state->mem[state->sp - 2] = state->c;
         state->sp -= 2;
         break;
 
-    case 0xC6: //ADI d8
-        lowerdec = state->a & 0x0F; //Pulls register A low 4 bit nibble
-        upperdec = opcode[1] & 0x0F; //Pulls added register low 4 bit nibble
+    case 0xC6:                       // ADI d8
+        lowerdec = state->a & 0x0F;  // Pulls register A low 4 bit nibble
+        upperdec = opcode[1] & 0x0F; // Pulls added register low 4 bit nibble
 
         result = state->a + opcode[1];
-        state->f.z = (0 == (result & 0xFF)); //Accounts for potential carry out of range of register A
+        state->f.z = (0 == (result & 0xFF)); // Accounts for potential carry out of range of register A
         state->f.s = (0x80 == (result & 0x80));
         state->f.cy = (result > 0xFF);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
 
-        result = lowerdec + upperdec; //Add lower 4 bit pairs to see if carry from bit 3 into bit 4
-        state->f.ac = result > 15; // If result greater 4 bit capacity, set AC flag, clears otherwise
+        result = lowerdec + upperdec; // Add lower 4 bit pairs to see if carry from bit 3 into bit 4
+        state->f.ac = result > 15;    // If result greater 4 bit capacity, set AC flag, clears otherwise
         state->pc++;
         break;
 
-    case 0xC7: //RST 0
+    case 0xC7: // RST 0
         result = state->pc + 1;
         state->mem[state->sp - 1] = (result >> 8);
-        state->mem[state->sp -2] = (result & 0xFF);
+        state->mem[state->sp - 2] = (result & 0xFF);
         state->sp -= 2;
-        state->pc = 0xFFFF; //Set up to overflow to 0x0000 with end of statement increment
+        state->pc = 0xFFFF; // Set up to overflow to 0x0000 with end of statement increment
         break;
 
-    case 0xC8: //RZ
-        if(state->f.z){
-            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+    case 0xC8: // RZ
+        if (state->f.z)
+        {
+            state->pc = state->mem[state->sp] | (state->mem[state->sp + 1] << 8);
             state->sp += 2;
         }
         break;
 
-    case 0xC9: //RET
-        state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+    case 0xC9: // RET
+        state->pc = state->mem[state->sp] | (state->mem[state->sp + 1] << 8);
         state->sp += 2;
         break;
 
-    case 0xCA: //JZ a16
-        if(state->f.z){
+    case 0xCA: // JZ a16
+        if (state->f.z)
+        {
             state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xCB: //JMP a16
+    case 0xCB: // JMP a16
         state->pc = (opcode[2] << 8) | opcode[1];
         state->pc--;
         break;
@@ -2010,7 +2206,8 @@ int CPU::Emulate8080Codes(State8080 *state)
         else
         {
             state->pc += 2;
-            break;
+        }
+        break;
 
     case 0xDD:                                     //*Call a16
         result = state->pc + 2;                    // push the address of the next instruction to the stack
@@ -2037,112 +2234,129 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->pc--;
         break;
 
-    case 0xE0:  // RPO - Return if parity flag is odd (cleared)
-        if(!state->f.p){
-            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+    case 0xE0: // RPO - Return if parity flag is odd (cleared)
+        if (!state->f.p)
+        {
+            state->pc = state->mem[state->sp] | (state->mem[state->sp + 1] << 8);
             state->sp += 2;
         }
         break;
 
-    case 0xE1:  //  POP H
+    case 0xE1: //  POP H
         state->l = state->mem[state->sp];
-        state->h = state->mem[state->sp+1];
+        state->h = state->mem[state->sp + 1];
         state->sp += 2;
         break;
 
-    case 0xE2:  // JPO adr code[2], code[1] - Jump if party flag is odd (cleared)
-        if(!state->f.p){
+    case 0xE2: // JPO adr code[2], code[1] - Jump if party flag is odd (cleared)
+        if (!state->f.p)
+        {
             state->pc = (opcode[2] << 8) | opcode[1];
-            state->pc --;
+            state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xE3:  // XTHL - exchange thing at sp with l and thing at sp+1 with h
+    case 0xE3: // XTHL - exchange thing at sp with l and thing at sp+1 with h
         result = state->l;
         state->l = state->mem[state->sp];
         state->mem[state->sp] = result;
         result = state->h;
-        state->h = state->mem[state->sp+1];
-        state->mem[state->sp+1] = result;
+        state->h = state->mem[state->sp + 1];
+        state->mem[state->sp + 1] = result;
         break;
 
-    case 0xE4:  // CPO adr code[2], code[1] - call if parity flag even
-        if(!state->f.p){
+    case 0xE4: // CPO adr code[2], code[1] - call if parity flag even
+        if (!state->f.p)
+        {
             result = state->pc + 2;
-            state->mem[state->sp-1] = (result >> 8) & 0xFF;
-            state->mem[state->sp-2] = (result & 0xFF);
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
             state->sp = state->sp - 2;
             state->pc = (opcode[2] << 8) | opcode[1];
-            state->pc --;
+            state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xE5:  // PUSH H
-        state->mem[state->sp-1] = state->h;
-        state->mem[state->sp-2] = state->l;
-        state->sp = state->sp -2;
+    case 0xE5: // PUSH H
+        state->mem[state->sp - 1] = state->h;
+        state->mem[state->sp - 2] = state->l;
+        state->sp = state->sp - 2;
         break;
 
-    case 0xE6:  // ANI data code[1] - A and opcode[1]. Clears carry and aux carry flags
+    case 0xE6: // ANI data code[1] - A and opcode[1]. Clears carry and aux carry flags
         state->a = state->a & opcode[1];
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
-        state->pc ++;
-        break;
- 
-    case 0xE7:  // RST 4 - transfer control to address 8 * 4
-        state->mem[state->sp-1] = state->pc >> 8;
-        state->mem[state->sp-2] = state->pc & 0xff;
-        state->sp = state->sp-2;
-        state->pc = 8 * 4;
-        state->pc --;
+        state->pc++;
         break;
 
-    case 0xE8:  // RPE - Return if parity equal
-        if(state->f.p){
-            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+    case 0xE7: // RST 4 - transfer control to address 8 * 4
+        state->mem[state->sp - 1] = state->pc >> 8;
+        state->mem[state->sp - 2] = state->pc & 0xff;
+        state->sp = state->sp - 2;
+        state->pc = 8 * 4;
+        state->pc--;
+        break;
+
+    case 0xE8: // RPE - Return if parity equal
+        if (state->f.p)
+        {
+            state->pc = state->mem[state->sp] | (state->mem[state->sp + 1] << 8);
             state->sp += 2;
         }
         break;
 
-    case 0xE9:  // PCHL - Jump H and L indirect. Moves H and L to PC
+    case 0xE9: // PCHL - Jump H and L indirect. Moves H and L to PC
         hl = (state->h << 8) | state->l;
         state->pc = hl;
-        state->pc --;           // decrement control pointer so it stays at hl
+        state->pc--; // decrement control pointer so it stays at hl
         break;
 
-    case 0xEA:  // JPE adr code[2], code[1] - jump if parity equal
-        if(state->f.p){
+    case 0xEA: // JPE adr code[2], code[1] - jump if parity equal
+        if (state->f.p)
+        {
             state->pc = (opcode[2] << 8) | opcode[1];
-            state->pc --;
+            state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xEB:  // XCHG - exchange d & e with h & l registers
+    case 0xEB: // XCHG - exchange d & e with h & l registers
         result = state->h;
         state->h = state->d;
         state->d = result;
@@ -2151,67 +2365,79 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->e = result;
         break;
 
-    case 0xEC:  // CPE adr code[2], code[1] - call if parity flag even
-        if(state->f.p){
+    case 0xEC: // CPE adr code[2], code[1] - call if parity flag even
+        if (state->f.p)
+        {
             result = state->pc + 2;
-            state->mem[state->sp-1] = (result >> 8) & 0xFF;
-            state->mem[state->sp-2] = (result & 0xFF);
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
             state->sp = state->sp - 2;
             state->pc = (opcode[2] << 8) | opcode[1];
-            state->pc --;
+            state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xED:  // CALL adr code[2], code[1]
+    case 0xED: // CALL adr code[2], code[1]
         result = state->pc + 2;
-        state->mem[state->sp-1] = (result >> 8) & 0xFF;
-        state->mem[state->sp-2] = (result & 0xFF);
+        state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+        state->mem[state->sp - 2] = (result & 0xFF);
         state->sp = state->sp - 2;
         state->pc = (opcode[2] << 8) | opcode[1];
-        state->pc --;
+        state->pc--;
         break;
 
-    case 0xEE:  // XRI data code[1] - exclusive or A with opcode[1]. Clears carry and aux carry flags
+    case 0xEE: // XRI data code[1] - exclusive or A with opcode[1]. Clears carry and aux carry flags
         state->a = state->a ^ opcode[1];
-        if(Parity(state->a)){
+        if (Parity(state->a))
+        {
             state->f.p = 1; // set parity flag if 0th bit is 0
-        } else {
+        }
+        else
+        {
             state->f.p = 0;
         }
-        if(state->a == 0){
+        if (state->a == 0)
+        {
             state->f.z = 1; // set zero flag if result is 0
-        } else {
+        }
+        else
+        {
             state->f.z = 0;
         }
-        if((state->a & (1 << 7)) >> 7 == 1){
+        if ((state->a & (1 << 7)) >> 7 == 1)
+        {
             state->f.s = 1; // set sign flag if most significant bit is set
-        } else {
+        }
+        else
+        {
             state->f.s = 0;
         }
         state->f.cy = 0;
         state->f.ac = 0;
-        state->pc ++;
+        state->pc++;
         break;
 
-    case 0xEF:  // RST 5 - transfer control to address 8 * 5
-        state->mem[state->sp-1] = state->pc >> 8;
-        state->mem[state->sp-2] = state->pc & 0xff;
-        state->sp = state->sp-2;
+    case 0xEF: // RST 5 - transfer control to address 8 * 5
+        state->mem[state->sp - 1] = state->pc >> 8;
+        state->mem[state->sp - 2] = state->pc & 0xff;
+        state->sp = state->sp - 2;
         state->pc = 8 * 5;
-        state->pc --;
+        state->pc--;
         break;
 
-    case 0xF0:  // RP - return if positive (sign flag is cleared)
-        if(!state->f.s){
-            state->pc = state->mem[state->sp] | (state->mem[state->sp+1] << 8);
+    case 0xF0: // RP - return if positive (sign flag is cleared)
+        if (!state->f.s)
+        {
+            state->pc = state->mem[state->sp] | (state->mem[state->sp + 1] << 8);
             state->sp += 2;
         }
         break;
 
-    case 0xF1:  // POP PSW
+    case 0xF1: // POP PSW
         // Contents of memory location pointed at by SP is used to restore condition flags.
         // cy is 0th bit, p 2nd, ac 4th, z 6th, and s 7th.
         state->f.cy = (state->mem[state->sp] & (1 << 0)) >> 0;
@@ -2219,21 +2445,23 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.ac = (state->mem[state->sp] & (1 << 4)) >> 4;
         state->f.z = (state->mem[state->sp] & (1 << 6)) >> 6;
         state->f.s = (state->mem[state->sp] & (1 << 7)) >> 7;
-        state->a = state->mem[state->sp+1];     // Then the datasheet says to do this
-        state->sp = state->sp+2;
+        state->a = state->mem[state->sp + 1]; // Then the datasheet says to do this
+        state->sp = state->sp + 2;
         break;
 
-    case 0xF2:  // JP adr code[1], code[1] - jump if positive (sign flag is cleared)
-        if(!state->f.s){
+    case 0xF2: // JP adr code[1], code[1] - jump if positive (sign flag is cleared)
+        if (!state->f.s)
+        {
             state->pc = (opcode[2] << 8) | opcode[1];
-            state->pc --;
+            state->pc--;
         }
-        else{
+        else
+        {
             state->pc += 2;
         }
         break;
 
-    case 0xF3:  // DI - this disables system interrupts and would need to be implemented alongside later code
+    case 0xF3: // DI - this disables system interrupts and would need to be implemented alongside later code
         // TODO
         CPU::UnimplementedInstruction(state);
         break;
@@ -2266,19 +2494,19 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->pc += 1;
         break;
 
-    case 0xF7: // RST 6
+    case 0xF7:                                     // RST 6
         result = state->pc;                        // Store the address of the next instruction on the stack
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 8 * 6;                        // sets pc to 8 multiplied by the number associated with RST (8*6)
+        state->pc = 8 * 6;                         // sets pc to 8 multiplied by the number associated with RST (8*6)
         state->pc--;
         break;
 
-    case 0xF8: // RM
+    case 0xF8:          // RM
         if (state->f.s) // if sign flag set. Perform RET which pops stack into program counter
         {
-            state->pc = (state->mem[state->sp + 1] << 8) | state->mem[state->sp];                                               // Jump to the return address
+            state->pc = (state->mem[state->sp + 1] << 8) | state->mem[state->sp]; // Jump to the return address
             state->sp += 2;
         }
         break;
@@ -2333,12 +2561,12 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->pc += 1;
         break;
 
-    case 0xFF: // RST 7
+    case 0xFF:                                     // RST 7
         result = state->pc;                        // Store the address of the next instruction on the stack
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 8 * 7;                        // sets pc to 8 multiplied by the number associated with RST (8*7)
+        state->pc = 8 * 7;                         // sets pc to 8 multiplied by the number associated with RST (8*7)
         state->pc--;
         break;
     }
