@@ -2492,7 +2492,7 @@ int CPU::Emulate8080Codes(State8080 *state)
 
     case 0xF3: // DI - this disables system interrupts and would need to be implemented alongside later code
         // TODO
-        CPU::UnimplementedInstruction(state);
+        // CPU::UnimplementedInstruction(state);
         break;
 
     case 0xF4: // CP adr
@@ -2558,7 +2558,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xFB: // EI (TODO - Special)
-        CPU::UnimplementedInstruction(state);
+        // CPU::UnimplementedInstruction(state);
         break;
 
     case 0xFC: // CM adr (CALL if minus)
