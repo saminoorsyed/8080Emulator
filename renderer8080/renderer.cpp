@@ -3,11 +3,13 @@
 
 using namespace std;
 
-Renderer::Renderer() {}
+Renderer8080::Renderer8080() {}
 
 /* Render pixels from VRam, scanning from the bottom left to the top right. Each segment of y comprises 8 bits to examine. */
-void Renderer::RenderPixels(CPU::State8080* state)
+void Renderer8080::RenderPixels(CPU::State8080* state)
 {
+	SDL_RenderClear(sdlRenderer);
+	SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 0);
 	int vRamAddress = 0x2400;
 	// We render from the bottom of column one to the top of column one, then proceed to the next column
 	for (int xPixel = 0; xPixel < XPixelCount; ++xPixel)
@@ -26,25 +28,32 @@ void Renderer::RenderPixels(CPU::State8080* state)
 				int xPos = xPixel;
 				if (drawPixel)
 				{
-					// TODO - draw gameobject color pixel at xPos and yPos
+					// draw gameobject color pixel at xPos and yPos
+					SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
 				}
 				else
 				{
-					// TODO - draw background color pixel at xPos and yPos
+					// draw background color pixel at xPos and yPos
+					SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
 				}
+				SDL_RenderDrawPoint(sdlRenderer, xPos, yPos);
 				// so shift right to check the next bit
 				videoByte = videoByte >> 1;
 			}
 		}
 	}
+	SDL_RenderPresent(sdlRenderer);
 }
 
-void Renderer::drawPixel(int xPos, int yPos)
+void Renderer8080::init()
 {
-	// TODO - Implement function on per platform basis
-#if _WIN32
-	// windows draw logic
-#else
-	// other draw logic
-#endif
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_CreateWindowAndRenderer(XPixelCount, YPixelCount, 0, &window, &sdlRenderer);
+}
+
+void Renderer8080::destory()
+{
+	SDL_DestroyRenderer(sdlRenderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 }

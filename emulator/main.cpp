@@ -1,7 +1,10 @@
 #include <fstream>
+#include <chrono>
+#include "../renderer8080/renderer.h"
 #include <filesystem>
 
 using namespace std;
+using namespace std::chrono;
 namespace FileSystem = std::filesystem;
 
 #include "emulator_shell.h" 
@@ -55,10 +58,25 @@ int main(int argc, char **argv)
     ReadFileIntoMemoryAt(state, "../ROM/invaders.e", 0x1800);
     // we need an instance of CPU to call the Emulator8080 codes 
     CPU cpu_instance;
+
+    // set up the rendering
+    milliseconds startingTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+    milliseconds currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+    const int frameTime = 100;
+    Renderer8080* vRender = new Renderer8080();
+    vRender->init();
+
     while (done == 0)
     {
+        currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
         done = cpu_instance.Emulate8080Codes(state);
+        if (currentTime.count() - startingTime.count() > frameTime)
+        {
+            vRender->RenderPixels(state);
+            startingTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+        }
     }
+    vRender->destory();
     free(mem_start);
     return 0;
 }
