@@ -2515,7 +2515,6 @@ int CPU::Emulate8080Codes(State8080 *state)
     printf("\tA $%02x B $%02x C $%02x D $%02x E $%02x H $%02x L $%02x SP %04x\n",
            state->a, state->b, state->c, state->d,
            state->e, state->h, state->l, state->sp);
-    fflush(stdout);
     // Potentially short term return, expect failed cases will return 1?
     return 0;
 }
