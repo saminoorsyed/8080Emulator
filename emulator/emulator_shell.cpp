@@ -521,7 +521,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0x42:
-        // MOV B, F
+        // MOV B, D
         // state->b = FlagCalc(state->f);
         state->b = state->d;
         break;
