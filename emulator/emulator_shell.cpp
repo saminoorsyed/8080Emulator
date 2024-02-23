@@ -521,8 +521,9 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0x42:
-        // MOV B, F
-        state->b = FlagCalc(state->f);
+        // MOV B, D
+        // state->b = FlagCalc(state->f);
+        state->b = state->d;
         break;
 
     case 0x43:
@@ -2080,11 +2081,11 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xCC: // CZ a16
         if (state->f.z)
         {
-            result = state->pc + 2;                    // save the address of the next instruction
-            state->mem[state->sp - 1] = (result >> 8); // high-order bits in higher stack addr
-            state->mem[state->sp - 2] = result & 0xff; // low-order bits in lower stack addr
-            state->sp -= 2;
-            state->pc = opcode[2] << 8 | opcode[1];
+            result = state->pc + 2;
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
+            state->sp = state->sp - 2;
+            state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
         else
@@ -2155,11 +2156,11 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xD4: // CNC
         if (!state->f.cy)
         {
-            result = state->pc + 2;                    // push the address of the next instruction to the stack
-            state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
-            state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
-            state->sp -= 2;                            // stack grows downward
-            state->pc = (opcode[2] << 8) | opcode[1];  // jump to addr in immediate data
+            result = state->pc + 2;
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
+            state->sp = state->sp - 2;
+            state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
         else
@@ -2225,11 +2226,11 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xDC: // CC A16
         if (state->f.cy)
         {
-            result = state->pc + 2;                    // push the address of the next instruction to the stack
-            state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
-            state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
-            state->sp -= 2;                            // stack grows downward
-            state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
+            result = state->pc + 2;
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
+            state->sp = state->sp - 2;
+            state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
         else
@@ -2498,8 +2499,12 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xF4: // CP adr
         if (state->f.s == 0)
         {
+            result = state->pc + 2;
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
+            state->sp = state->sp - 2;
             state->pc = (opcode[2] << 8) | opcode[1];
-            state->pc -= 1;
+            state->pc--;
         }
         else
         {
@@ -2565,10 +2570,10 @@ int CPU::Emulate8080Codes(State8080 *state)
         if (state->f.s)
         {
             result = state->pc + 2;
-            state->mem[state->sp - 1] = (result >> 8); // higher 8 bits to the higher sp
-            state->mem[state->sp - 2] = result & 0xff; // lower 8 bits to the lower sp
-            state->sp -= 2;                            // stack grows downward
-            state->pc = (opcode[2] << 8) | opcode[1];  // jump to address loaded from immediate data
+            state->mem[state->sp - 1] = (result >> 8) & 0xFF;
+            state->mem[state->sp - 2] = (result & 0xFF);
+            state->sp = state->sp - 2;
+            state->pc = (opcode[2] << 8) | opcode[1];
             state->pc--;
         }
         else
