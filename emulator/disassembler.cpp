@@ -233,7 +233,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
         printf("MOV     B,C");
         break;
     case 0x42:
-        printf("MOV     B,F");
+        printf("MOV     B,D");
         break;
     case 0x43:
         printf("MOV     B,E");
