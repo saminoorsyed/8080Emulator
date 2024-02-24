@@ -52,8 +52,7 @@ void Renderer8080::init()
 	int scaledWindowHeight = YPixelCount * WindowScaleFactor;
 	window = SDL_CreateWindow("INCEPTION",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		scaledWindowWidth, scaledWindowHeight,
-		SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+		scaledWindowWidth, scaledWindowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN); // todo - set SDL_WINDOW_RESIZABLE flag and make scaling
 	sdlRenderer = SDL_CreateRenderer(window, 0, 0);
 	SDL_RenderSetLogicalSize(sdlRenderer, XPixelCount, YPixelCount);
 }
