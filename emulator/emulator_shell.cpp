@@ -127,6 +127,7 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0x07:                              // RLC
         result = 0x80 == (state->a & 0x80); // get most significant bit
         state->a = state->a << 1;
+        if(result) state->a += 1; //Low order bit set to value shifted out of high order bit
         state->f.cy = result;
         break;
 
@@ -177,9 +178,9 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0x0F: // RRC
-        // the least significant bit is always 1 for odd numbers
-        result = (state->a % 2 != 0);
+        result = state->a & 1; // get least significant bit
         state->a = state->a >> 1;
+        if(result) state->a = state->a | 0x80; //Low order bit set to value shifted out of high order bit
         state->f.cy = result;
         break;
 
@@ -244,12 +245,10 @@ int CPU::Emulate8080Codes(State8080 *state)
         de = (state->d << 8) | state->e;
         hl = (state->h << 8) | state->l;
         result = de + hl;
-        state->d = de >> 8;
-        state->e = (de - (state->d << 8));
+        hl = result & 0xffff;
         state->h = hl >> 8;
         state->l = (hl - (state->h << 8));
-        state->f.cy = (result > 0xffff);
-        hl = result & 0xffff;
+        state->f.cy = result > 0xffff;
         break;
 
     case 0x1A: // LDAX D
@@ -522,7 +521,6 @@ int CPU::Emulate8080Codes(State8080 *state)
 
     case 0x42:
         // MOV B, D
-        // state->b = FlagCalc(state->f);
         state->b = state->d;
         break;
 
@@ -1143,82 +1141,81 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0x98:                                                                            // SBB B
-        result = state->a + (~state->b) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->b > state->a;
+        result = state->a + ~(state->b + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->b + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->b + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->b + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
 
     case 0x99:                                                                            // SBB C
-        result = state->a + (~state->c) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->c) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->c > state->a;
+        result = state->a + ~(state->c + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->c + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->c + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->c + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
 
     case 0x9A:                                                                            // SBB D
-        result = state->a + (~state->d) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->d) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->d > state->a;
+        result = state->a + ~(state->d + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->d + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->d + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->d + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
 
     case 0x9B:                                                                            // SBB E
-        result = state->a + (~state->e) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->e > state->a;
+        result = state->a + ~(state->e + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->e + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->e + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->e + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
 
     case 0x9C:                                                                            // SBB H
-        result = state->a + (~state->h) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->h) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->h > state->a;
+        result = state->a + ~(state->h + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->h + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->h + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->h + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
-
     case 0x9D:                                                                            // SBB L
-        result = state->a + (~state->l) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->l) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->l > state->a;
+        result = state->a + ~(state->l + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->l + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->l + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->l + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
 
     case 0x9E: // SBB M
         hl = (state->h << 8) | state->l;
-        result = state->a + (~state->mem[hl]) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->mem[hl]) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->mem[hl] > state->a;
+        result = state->a + ~(state->mem[hl] + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->mem[hl] + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->mem[hl] + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->mem[hl] + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
 
     case 0x9F:                                                                            // SBB A
-        result = state->a + (~state->a) + (~state->f.cy);                                 // 2s complement subtraction, flips state of CY flag
-        state->f.ac = ((state->a & 0x0F) + ((~state->a) & 0x0F) + (~state->f.cy)) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = 0;
+        result = state->a + ~(state->a + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
+        state->f.ac = ((state->a & 0x0F) + (~(state->a + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
+        state->f.cy = (state->a + state->f.cy) > state->a;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
+        state->f.z = state->a == (state->a + state->f.cy);
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
@@ -1272,148 +1269,52 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xA4: // ANA H
+        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
+        upperdec = state->h & 0x08; // Isolate bit 3 from AND register
+
+        state->f.cy = 0;                             // ANA clears carry
+        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
         state->a = state->a & state->h;
-        lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1)
-        { // aux carry logic
-            state->a += 6;
-            if (lowerdec > 15)
-                state->f.ac = 1;
-        }
-        if (Parity(state->a))
-        {
-            state->f.p = 1; // set parity flag if 0th bit is 0
-        }
-        else
-        {
-            state->f.p = 0;
-        }
-        if (state->a == 0)
-        {
-            state->f.z = 1; // set zero flag if result is 0
-        }
-        else
-        {
-            state->f.z = 0;
-        }
-        if ((state->a & (1 << 7)) >> 7 == 1)
-        {
-            state->f.s = 1; // set sign flag if most significant bit is set
-        }
-        else
-        {
-            state->f.s = 0;
-        }
-        state->f.cy = 0;
+        state->f.z = 0 == state->a;
+        state->f.s = 0x80 == (state->a & 0x80);
+        state->f.p = Parity(state->a);
         break;
 
     case 0xA5: // ANA L
+        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
+        upperdec = state->l & 0x08; // Isolate bit 3 from AND register
+
+        state->f.cy = 0;                             // ANA clears carry
+        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
         state->a = state->a & state->l;
-        lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1)
-        { // aux carry logic
-            state->a += 6;
-            if (lowerdec > 15)
-                state->f.ac = 1;
-        }
-        if (Parity(state->a))
-        {
-            state->f.p = 1; // set parity flag if 0th bit is 0
-        }
-        else
-        {
-            state->f.p = 0;
-        }
-        if (state->a == 0)
-        {
-            state->f.z = 1; // set zero flag if result is 0
-        }
-        else
-        {
-            state->f.z = 0;
-        }
-        if ((state->a & (1 << 7)) >> 7 == 1)
-        {
-            state->f.s = 1; // set sign flag if most significant bit is set
-        }
-        else
-        {
-            state->f.s = 0;
-        }
-        state->f.cy = 0;
+        state->f.z = 0 == state->a;
+        state->f.s = 0x80 == (state->a & 0x80);
+        state->f.p = Parity(state->a);
         break;
 
     case 0xA6: // ANA M
         hl = (state->h << 8) | state->l;
+        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
+        upperdec = state->mem[hl] & 0x08; // Isolate bit 3 from AND register
+
+        state->f.cy = 0;                             // ANA clears carry
+        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
         state->a = state->a & state->mem[hl];
-        lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1)
-        { // aux carry logic
-            state->a += 6;
-            if (lowerdec > 15)
-                state->f.ac = 1;
-        }
-        if (Parity(state->a))
-        {
-            state->f.p = 1; // set parity flag if 0th bit is 0
-        }
-        else
-        {
-            state->f.p = 0;
-        }
-        if (state->a == 0)
-        {
-            state->f.z = 1; // set zero flag if result is 0
-        }
-        else
-        {
-            state->f.z = 0;
-        }
-        if ((state->a & (1 << 7)) >> 7 == 1)
-        {
-            state->f.s = 1; // set sign flag if most significant bit is set
-        }
-        else
-        {
-            state->f.s = 0;
-        }
-        state->f.cy = 0;
+        state->f.z = 0 == state->a;
+        state->f.s = 0x80 == (state->a & 0x80);
+        state->f.p = Parity(state->a);
         break;
 
     case 0xA7: // ANA A
+        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
+        upperdec = state->a & 0x08; // Isolate bit 3 from AND register
+
+        state->f.cy = 0;                             // ANA clears carry
+        state->f.ac = 0x08 == (lowerdec | upperdec); // AC flag set to OR of bit 3s from involved registers
         state->a = state->a & state->a;
-        lowerdec = state->a & 0x0F;
-        if (lowerdec > 9 || state->f.ac == 1)
-        { // aux carry logic
-            state->a += 6;
-            if (lowerdec > 15)
-                state->f.ac = 1;
-        }
-        if (Parity(state->a))
-        {
-            state->f.p = 1; // set parity flag if 0th bit is 0
-        }
-        else
-        {
-            state->f.p = 0;
-        }
-        if (state->a == 0)
-        {
-            state->f.z = 1; // set zero flag if result is 0
-        }
-        else
-        {
-            state->f.z = 0;
-        }
-        if ((state->a & (1 << 7)) >> 7 == 1)
-        {
-            state->f.s = 1; // set sign flag if most significant bit is set
-        }
-        else
-        {
-            state->f.s = 0;
-        }
-        state->f.cy = 0;
+        state->f.z = 0 == state->a;
+        state->f.s = 0x80 == (state->a & 0x80);
+        state->f.p = Parity(state->a);
         break;
 
     case 0xA8: // XRA B
@@ -1926,9 +1827,9 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xBB:                                                               // CMP E
-        result = state->a + (~state->b) + 1;                                 // 2s complement subtraction
-        state->f.ac = ((state->a & 0x0F) + ((~state->b) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
-        state->f.cy = state->b > state->a;
+        result = state->a + (~state->e) + 1;                                 // 2s complement subtraction
+        state->f.ac = ((state->a & 0x0F) + ((~state->e) & 0x0F) + 1) > 0x0F; // Apparently they don't bother flipping this
+        state->f.cy = state->e > state->a;
         state->f.s = 0x80 == (result & 0x80);
         state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
@@ -2101,6 +2002,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->sp -= 2;                            // stack grows downward
         state->pc = (opcode[2] << 8) | opcode[1];  // Jump to the address immediately after the pc
         state->pc--;
+
         break;
 
     case 0xCE:                                       // ACI d8
@@ -2586,11 +2488,12 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xFE: // CPI D8 - Subtract data from accumulator, set flags with result
-        result = state->a - opcode[1];
-        state->f.cy = result > 0xff;
+        lowerdec = opcode[1]; //Store value for subtraction
+        state->f.z = state->a == lowerdec;
+        state->f.cy = lowerdec > state->a;
+        result = state->a - lowerdec;
         state->f.ac = (result & 0x0F) == 0x0F;
         state->f.s = 0x80 == (result & 0x80);
-        state->f.z = 0 == (result & 0xFF);
         state->f.p = Parity(result & 0xFF);
         state->pc += 1;
         break;
