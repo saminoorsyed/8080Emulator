@@ -48,7 +48,14 @@ void Renderer8080::RenderPixels(CPU::State8080* state)
 void Renderer8080::init()
 {
 	SDL_Init(SDL_INIT_VIDEO);
-	SDL_CreateWindowAndRenderer(XPixelCount, YPixelCount, 0, &window, &sdlRenderer);
+	int scaledWindowWidth = XPixelCount * WindowScaleFactor;
+	int scaledWindowHeight = YPixelCount * WindowScaleFactor;
+	window = SDL_CreateWindow("INCEPTION",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		scaledWindowWidth, scaledWindowHeight,
+		SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	sdlRenderer = SDL_CreateRenderer(window, 0, 0);
+	SDL_RenderSetLogicalSize(sdlRenderer, XPixelCount, YPixelCount);
 }
 
 void Renderer8080::destory()

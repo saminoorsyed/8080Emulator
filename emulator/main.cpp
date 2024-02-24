@@ -70,6 +70,12 @@ int main(int argc, char **argv)
     {
         currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
         done = cpu_instance.Emulate8080Codes(state);
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+                done = 1;
+        }
         if (currentTime.count() - startingTime.count() > frameTime)
         {
             vRender->RenderPixels(state);
