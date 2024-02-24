@@ -55,6 +55,7 @@ void Renderer8080::init()
 		scaledWindowWidth, scaledWindowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN); // todo - set SDL_WINDOW_RESIZABLE flag and make scaling
 	sdlRenderer = SDL_CreateRenderer(window, 0, 0);
 	SDL_RenderSetLogicalSize(sdlRenderer, XPixelCount, YPixelCount);
+	SDL_SetWindowTitle(window, "INTEL 8080 EMULATOR");
 }
 
 void Renderer8080::destory()
