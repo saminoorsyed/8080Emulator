@@ -24,7 +24,7 @@ void Renderer8080::RenderPixels(CPU::State8080* state)
 			{
 				// get the right most bit by itself, if 1 draw pixel is true else false
 				bool drawPixel = videoByte & 0x1;
-				int yPos = (yPixel + 8) - bitIndex;
+				int yPos = (yPixel + 8) + bitIndex;
 				int xPos = xPixel;
 				if (drawPixel)
 				{
@@ -36,7 +36,7 @@ void Renderer8080::RenderPixels(CPU::State8080* state)
 					// draw background color pixel at xPos and yPos
 					SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
 				}
-				SDL_RenderDrawPoint(sdlRenderer, xPos, yPos);
+				SDL_RenderDrawPoint(sdlRenderer, xPos, YPixelCount - yPos);
 				// so shift right to check the next bit
 				videoByte = videoByte >> 1;
 			}
