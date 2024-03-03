@@ -2,6 +2,7 @@
 #include <chrono>
 #include "../renderer8080/renderer.h"
 #include <filesystem>
+#include <thread>
 
 using namespace std;
 using namespace std::chrono;
@@ -44,6 +45,31 @@ CPU::State8080 *Init8080(void)
     return state;
 }
 
+void RenderGraphics(CPU::State8080* state)
+{
+    milliseconds startingTime, currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+    const int frameTime = 100;
+    SDL_Event event;
+    Renderer8080* vRender = new Renderer8080();
+    vRender->init();
+    bool terminate = false;
+    while (!terminate)
+    {
+        currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+                terminate = true;
+        }
+        if (currentTime.count() - startingTime.count() > frameTime)
+        {
+            vRender->RenderPixels(state);
+            startingTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+        }
+    }
+    vRender->destory();
+}
+
 
 int main(int argc, char **argv)
 {
@@ -59,30 +85,19 @@ int main(int argc, char **argv)
     // we need an instance of CPU to call the Emulator8080 codes 
     CPU cpu_instance;
 
-    // set up the rendering
-    milliseconds startingTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
-    milliseconds currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
-    const int frameTime = 100;
-    Renderer8080* vRender = new Renderer8080();
-    vRender->init();
+    //Run Graphics on Graphics thread
+    thread RenderThread(RenderGraphics, state);
 
+    //Run CPU on Main Thread
     while (done == 0)
     {
-        currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
-        done = cpu_instance.Emulate8080Codes(state);
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+        for (int i = 0; i < 10000; i++)
         {
-            if (event.type == SDL_QUIT)
-                done = 1;
+            done = cpu_instance.Emulate8080Codes(state);
         }
-        if (currentTime.count() - startingTime.count() > frameTime)
-        {
-            vRender->RenderPixels(state);
-            startingTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
-        }
+        cpu_instance.PerformInterrupt(state);
+        this_thread::sleep_for(milliseconds(25));
     }
-    vRender->destory();
     free(mem_start);
     return 0;
 }
