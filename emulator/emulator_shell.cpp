@@ -2011,7 +2011,6 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xC7: // RST 0
-        result = state->pc + 1;
         state->mem[state->sp - 1] = (result >> 8);
         state->mem[state->sp - 2] = (result & 0xFF);
         state->sp -= 2;
@@ -2159,7 +2158,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 0x0016;                        // sets pc to 8 multiplied by the number associated with RST (8*2)
+        state->pc = 0x0010;                        // sets pc to 8 multiplied by the number associated with RST (8*2)
         state->pc--;
         break;
 
@@ -2335,7 +2334,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = state->pc >> 8;
         state->mem[state->sp - 2] = state->pc & 0xff;
         state->sp = state->sp - 2;
-        state->pc = 8 * 4;
+        state->pc = 0x0020;
         state->pc--;
         break;
 
@@ -2434,7 +2433,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = state->pc >> 8;
         state->mem[state->sp - 2] = state->pc & 0xff;
         state->sp = state->sp - 2;
-        state->pc = 8 * 5;
+        state->pc = 0x0028;
         state->pc--;
         break;
 
@@ -2511,7 +2510,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 8 * 6;                         // sets pc to 8 multiplied by the number associated with RST (8*6)
+        state->pc = 0x0030;                         // sets pc to 8 multiplied by the number associated with RST (8*6)
         state->pc--;
         break;
 
@@ -2579,7 +2578,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 8 * 7;                         // sets pc to 8 multiplied by the number associated with RST (8*7)
+        state->pc = 0x0038;                         // sets pc to 8 multiplied by the number associated with RST (8*7)
         state->pc--;
         break;
     }
