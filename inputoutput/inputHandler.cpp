@@ -23,18 +23,22 @@ void LoadPorts(CPU::State8080 *state, SDL_Event event)
             break;
         case SDLK_j: // p1 left
             state->port1 |= 1 << 5;
+            state->port1 &= ~(1 << 6);
             break;
         case SDLK_l: // p1 right
             state->port1 |= 1 << 6;
+            state->port1 &= ~(1 << 5);
             break;
         case SDLK_e: // p2 shoot
             state->port2 |= 1 << 4;
             break;
         case SDLK_s: // p2 left
             state->port2 |= 1 << 5;
+            state->port2 &= ~(1 << 6);
             break;
         case SDLK_f: // p2 right
             state->port2 |= 1 << 6;
+            state->port2 &= ~(1 << 5);
             break;
         }
     }
