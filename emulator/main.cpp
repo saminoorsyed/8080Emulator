@@ -95,17 +95,21 @@ int main(int argc, char **argv)
         for (int i = 0; i < 10000; i++)
         {
             done = cpu_instance.Emulate8080Codes(state);
-        }
-        cpu_instance.PerformInterrupt(state);
-        SDL_Event event;
-        while(SDL_PollEvent(&event)){
-            if (event.type == SDL_QUIT){
-                done = 1;
-            }else{
-                LoadPorts(state, event);
+            SDL_Event event;
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    done = 1;
+                }
+                else
+                {
+                    LoadPorts(state, event);
+                }
             }
         }
-        this_thread::sleep_for(milliseconds(25));
+        cpu_instance.PerformInterrupt(state);
+        this_thread::sleep_for(milliseconds(10));
         
     }
     free(mem_start);

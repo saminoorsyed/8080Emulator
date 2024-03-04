@@ -92,12 +92,8 @@ void CPU::PerformInterrupt(State8080 *state)
 
 void CPU::HandleInput(State8080 *state, uint8_t port)
 {
-    unsigned char a = 0;
     switch (port)
     {
-    case 0:
-        state->a & 0x00;
-        break;
     case 1:
         state->a = state->port1;
         break;

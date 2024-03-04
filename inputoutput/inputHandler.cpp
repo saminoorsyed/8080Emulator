@@ -6,6 +6,7 @@ void LoadPorts(CPU::State8080 *state, SDL_Event event)
 {
     if (event.type == SDL_KEYDOWN)
     {
+        std::cout << "Key Down: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
         switch (event.key.keysym.sym)
         {
         case SDLK_c: // coin
@@ -18,7 +19,7 @@ void LoadPorts(CPU::State8080 *state, SDL_Event event)
             state->port1 |= 1 << 2;
             break;
         case SDLK_i: // p1 shoot
-            state->port1 |= 1 < 4;
+            state->port1 |= 1 << 4;
             break;
         case SDLK_j: // p1 left
             state->port1 |= 1 << 5;
@@ -39,6 +40,7 @@ void LoadPorts(CPU::State8080 *state, SDL_Event event)
     }
     else if (event.type == SDL_KEYUP)
     {
+        std::cout << "Key Up: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
         switch (event.key.keysym.sym)
         {
         case SDLK_c: // coin
@@ -51,7 +53,7 @@ void LoadPorts(CPU::State8080 *state, SDL_Event event)
             state->port1 &= ~(1 << 2);
             break;
         case SDLK_i: // p1 shoot
-            state->port1 &= ~(1 < 4);
+            state->port1 &= ~(1 << 4);
             break;
         case SDLK_j: // p1 left
             state->port1 &= ~(1 << 5);
