@@ -3,6 +3,7 @@
 #include "../renderer8080/renderer.h"
 #include <filesystem>
 #include <thread>
+#include "../inputoutput/inputHandler.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -96,7 +97,16 @@ int main(int argc, char **argv)
             done = cpu_instance.Emulate8080Codes(state);
         }
         cpu_instance.PerformInterrupt(state);
+        SDL_Event event;
+        while(SDL_PollEvent(&event)){
+            if (event.type == SDL_QUIT){
+                done = 1;
+            }else{
+                LoadPorts(state, event);
+            }
+        }
         this_thread::sleep_for(milliseconds(25));
+        
     }
     free(mem_start);
     return 0;

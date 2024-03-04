@@ -65,7 +65,7 @@ bool CPU::IsAuxFlagSet(uint16_t number)
     return true;
 }
 
-void CPU::PerformInterrupt(State8080* state)
+void CPU::PerformInterrupt(State8080 *state)
 {
     if (state->int_enable)
     {
@@ -73,7 +73,7 @@ void CPU::PerformInterrupt(State8080* state)
         uint8_t upperByte = uint8_t(valuePC >> 8);
         uint8_t lowerByte = uint8_t(valuePC - (upperByte << 8));
 
-        //push statepc PUSH PC - seperate into upper and lower then set lower to sp - 2 and upper to sp - 1
+        // push statepc PUSH PC - seperate into upper and lower then set lower to sp - 2 and upper to sp - 1
         state->mem[state->sp - 2] = lowerByte;
         state->mem[state->sp - 1] = upperByte;
         state->pc = 8 * interruptNumber;
@@ -90,28 +90,27 @@ void CPU::PerformInterrupt(State8080* state)
     }
 }
 
-uint8_t CPU::HandleInput(uint8_t port)
+void CPU::HandleInput(State8080 *state, uint8_t port)
 {
     unsigned char a = 0;
     switch (port)
     {
     case 0:
-        return 0xf;
+        state->a & 0x00;
         break;
     case 1:
-        return 0; //in_port1;
+        state->a = state->port1;
         break;
     case 2:
-        return 0;
+        state->a = state->port2;
         break;
     case 3:
     {
         uint16_t v = (shift1 << 8) | shift0;
-        a = ((v >> (8 - shift_offset)) & 0xff);
+        state->a = ((v >> (8 - shift_offset)) & 0xff);
     }
     break;
     }
-    return a;
 }
 
 void CPU::HandleOutput(uint8_t port, uint8_t value)
@@ -122,14 +121,14 @@ void CPU::HandleOutput(uint8_t port, uint8_t value)
         shift_offset = value & 0x7;
         break;
     case 3:
-        //out_port3 = value;
+        // out_port3 = value;
         break;
     case 4:
         shift0 = shift1;
         shift1 = value;
         break;
     case 5:
-        //out_port5 = value;
+        // out_port5 = value;
         break;
     }
 }
@@ -140,7 +139,7 @@ int CPU::Emulate8080Codes(State8080 *state)
 {
     unsigned char *opcode = &state->mem[state->pc];
     // print the opcode before executing
-    //Disassemble8080Op(state->mem, state->pc);
+    // Disassemble8080Op(state->mem, state->pc);
     uint32_t result;
     uint8_t upperdec;
     uint8_t lowerdec;
@@ -196,7 +195,8 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0x07:                              // RLC
         result = 0x80 == (state->a & 0x80); // get most significant bit
         state->a = state->a << 1;
-        if(result) state->a += 1; //Low order bit set to value shifted out of high order bit
+        if (result)
+            state->a += 1; // Low order bit set to value shifted out of high order bit
         state->f.cy = result;
         break;
 
@@ -246,10 +246,11 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->pc += 1;
         break;
 
-    case 0x0F: // RRC
+    case 0x0F:                 // RRC
         result = state->a & 1; // get least significant bit
         state->a = state->a >> 1;
-        if(result) state->a = state->a | 0x80; //Low order bit set to value shifted out of high order bit
+        if (result)
+            state->a = state->a | 0x80; // Low order bit set to value shifted out of high order bit
         state->f.cy = result;
         break;
 
@@ -1209,7 +1210,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = result & 0xFF;
         break;
 
-    case 0x98:                                                                            // SBB B
+    case 0x98:                                                                             // SBB B
         result = state->a + ~(state->b + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->b + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->b + state->f.cy) > state->a;
@@ -1219,7 +1220,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = result & 0xFF;
         break;
 
-    case 0x99:                                                                            // SBB C
+    case 0x99:                                                                             // SBB C
         result = state->a + ~(state->c + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->c + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->c + state->f.cy) > state->a;
@@ -1229,7 +1230,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = result & 0xFF;
         break;
 
-    case 0x9A:                                                                            // SBB D
+    case 0x9A:                                                                             // SBB D
         result = state->a + ~(state->d + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->d + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->d + state->f.cy) > state->a;
@@ -1239,7 +1240,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = result & 0xFF;
         break;
 
-    case 0x9B:                                                                            // SBB E
+    case 0x9B:                                                                             // SBB E
         result = state->a + ~(state->e + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->e + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->e + state->f.cy) > state->a;
@@ -1249,7 +1250,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = result & 0xFF;
         break;
 
-    case 0x9C:                                                                            // SBB H
+    case 0x9C:                                                                             // SBB H
         result = state->a + ~(state->h + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->h + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->h + state->f.cy) > state->a;
@@ -1258,7 +1259,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.p = Parity(result & 0xFF);
         state->a = result & 0xFF;
         break;
-    case 0x9D:                                                                            // SBB L
+    case 0x9D:                                                                             // SBB L
         result = state->a + ~(state->l + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->l + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->l + state->f.cy) > state->a;
@@ -1279,7 +1280,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->a = result & 0xFF;
         break;
 
-    case 0x9F:                                                                            // SBB A
+    case 0x9F:                                                                             // SBB A
         result = state->a + ~(state->a + state->f.cy) + 1;                                 // 2s complement subtraction, flips state of CY flag
         state->f.ac = ((state->a & 0x0F) + (~(state->a + state->f.cy) + 1 & 0x0F) > 0x0F); // Apparently they don't bother flipping this
         state->f.cy = (state->a + state->f.cy) > state->a;
@@ -1337,7 +1338,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.p = Parity(state->a);
         break;
 
-    case 0xA4: // ANA H
+    case 0xA4:                      // ANA H
         lowerdec = state->a & 0x08; // Isolate bit 3 from A register
         upperdec = state->h & 0x08; // Isolate bit 3 from AND register
 
@@ -1349,7 +1350,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.p = Parity(state->a);
         break;
 
-    case 0xA5: // ANA L
+    case 0xA5:                      // ANA L
         lowerdec = state->a & 0x08; // Isolate bit 3 from A register
         upperdec = state->l & 0x08; // Isolate bit 3 from AND register
 
@@ -1363,7 +1364,7 @@ int CPU::Emulate8080Codes(State8080 *state)
 
     case 0xA6: // ANA M
         hl = (state->h << 8) | state->l;
-        lowerdec = state->a & 0x08; // Isolate bit 3 from A register
+        lowerdec = state->a & 0x08;       // Isolate bit 3 from A register
         upperdec = state->mem[hl] & 0x08; // Isolate bit 3 from AND register
 
         state->f.cy = 0;                             // ANA clears carry
@@ -1374,7 +1375,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->f.p = Parity(state->a);
         break;
 
-    case 0xA7: // ANA A
+    case 0xA7:                      // ANA A
         lowerdec = state->a & 0x08; // Isolate bit 3 from A register
         upperdec = state->a & 0x08; // Isolate bit 3 from AND register
 
@@ -2191,8 +2192,8 @@ int CPU::Emulate8080Codes(State8080 *state)
         }
         break;
 
-    case 0xDB:       // IN d8
-        state->a = HandleInput(opcode[1]);
+    case 0xDB: // IN d8
+        HandleInput(state, opcode[1]);
         state->pc++; // Since we haven't gotten to the I/O part of our project, this just skips over the data
         break;
 
@@ -2511,7 +2512,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 0x0030;                         // sets pc to 8 multiplied by the number associated with RST (8*6)
+        state->pc = 0x0030;                        // sets pc to 8 multiplied by the number associated with RST (8*6)
         state->pc--;
         break;
 
@@ -2563,8 +2564,8 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xFD: // NOP
         break;
 
-    case 0xFE: // CPI D8 - Subtract data from accumulator, set flags with result
-        lowerdec = opcode[1]; //Store value for subtraction
+    case 0xFE:                // CPI D8 - Subtract data from accumulator, set flags with result
+        lowerdec = opcode[1]; // Store value for subtraction
         state->f.z = state->a == lowerdec;
         state->f.cy = lowerdec > state->a;
         result = state->a - lowerdec;
@@ -2579,7 +2580,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 0x0038;                         // sets pc to 8 multiplied by the number associated with RST (8*7)
+        state->pc = 0x0038;                        // sets pc to 8 multiplied by the number associated with RST (8*7)
         state->pc--;
         break;
     }
