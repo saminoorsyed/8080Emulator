@@ -2011,6 +2011,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xC7: // RST 0
+        result = state->pc;
         state->mem[state->sp - 1] = (result >> 8);
         state->mem[state->sp - 2] = (result & 0xFF);
         state->sp -= 2;
