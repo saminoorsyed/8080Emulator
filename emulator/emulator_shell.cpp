@@ -65,13 +65,82 @@ bool CPU::IsAuxFlagSet(uint16_t number)
     return true;
 }
 
+void CPU::PerformInterrupt(State8080* state)
+{
+    if (state->int_enable)
+    {
+        uint16_t valuePC = state->pc - 1;
+        uint8_t upperByte = uint8_t(valuePC >> 8);
+        uint8_t lowerByte = uint8_t(valuePC - (upperByte << 8));
+
+        //push statepc PUSH PC - seperate into upper and lower then set lower to sp - 2 and upper to sp - 1
+        state->mem[state->sp - 2] = lowerByte;
+        state->mem[state->sp - 1] = upperByte;
+        state->pc = 8 * interruptNumber;
+        state->sp -= 2;
+        if (interruptNumber == 1)
+        {
+            interruptNumber = 2;
+        }
+        else
+        {
+            interruptNumber = 1;
+        }
+        state->int_enable = 0;
+    }
+}
+
+uint8_t CPU::HandleInput(uint8_t port)
+{
+    unsigned char a = 0;
+    switch (port)
+    {
+    case 0:
+        return 0xf;
+        break;
+    case 1:
+        return 0; //in_port1;
+        break;
+    case 2:
+        return 0;
+        break;
+    case 3:
+    {
+        uint16_t v = (shift1 << 8) | shift0;
+        a = ((v >> (8 - shift_offset)) & 0xff);
+    }
+    break;
+    }
+    return a;
+}
+
+void CPU::HandleOutput(uint8_t port, uint8_t value)
+{
+    switch (port)
+    {
+    case 2:
+        shift_offset = value & 0x7;
+        break;
+    case 3:
+        //out_port3 = value;
+        break;
+    case 4:
+        shift0 = shift1;
+        shift1 = value;
+        break;
+    case 5:
+        //out_port5 = value;
+        break;
+    }
+}
+
 // Function for emulating 8080 opcodes, has case for each of our opcodes
 // Unimplemented instructions will call UnimplementedInstruction function
 int CPU::Emulate8080Codes(State8080 *state)
 {
     unsigned char *opcode = &state->mem[state->pc];
     // print the opcode before executing
-    Disassemble8080Op(state->mem, state->pc);
+    //Disassemble8080Op(state->mem, state->pc);
     uint32_t result;
     uint8_t upperdec;
     uint8_t lowerdec;
@@ -1942,7 +2011,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xC7: // RST 0
-        result = state->pc + 1;
+        result = state->pc;
         state->mem[state->sp - 1] = (result >> 8);
         state->mem[state->sp - 2] = (result & 0xFF);
         state->sp -= 2;
@@ -2052,6 +2121,7 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xD3: // OUT d8
         // this is unimplemented as it deals with sending data to external hardware
         // for now I'll skip over the operation's data
+        HandleOutput(opcode[1], state->a);
         state->pc++;
         break;
 
@@ -2089,7 +2159,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 0x0016;                        // sets pc to 8 multiplied by the number associated with RST (8*2)
+        state->pc = 0x0010;                        // sets pc to 8 multiplied by the number associated with RST (8*2)
         state->pc--;
         break;
 
@@ -2122,6 +2192,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xDB:       // IN d8
+        state->a = HandleInput(opcode[1]);
         state->pc++; // Since we haven't gotten to the I/O part of our project, this just skips over the data
         break;
 
@@ -2193,6 +2264,12 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xE3: // XTHL - exchange thing at sp with l and thing at sp+1 with h
+        // decrement HL before we stack it
+        hl = (state->h << 8) | state->l;
+        hl--;
+        state->h = hl >> 8;
+        state->l = (hl - (state->h << 8));
+
         result = state->l;
         state->l = state->mem[state->sp];
         state->mem[state->sp] = result;
@@ -2258,7 +2335,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = state->pc >> 8;
         state->mem[state->sp - 2] = state->pc & 0xff;
         state->sp = state->sp - 2;
-        state->pc = 8 * 4;
+        state->pc = 0x0020;
         state->pc--;
         break;
 
@@ -2357,7 +2434,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = state->pc >> 8;
         state->mem[state->sp - 2] = state->pc & 0xff;
         state->sp = state->sp - 2;
-        state->pc = 8 * 5;
+        state->pc = 0x0028;
         state->pc--;
         break;
 
@@ -2394,8 +2471,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0xF3: // DI - this disables system interrupts and would need to be implemented alongside later code
-        // TODO
-        // CPU::UnimplementedInstruction(state);
+        state->int_enable = 0;
         break;
 
     case 0xF4: // CP adr
@@ -2435,7 +2511,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 8 * 6;                         // sets pc to 8 multiplied by the number associated with RST (8*6)
+        state->pc = 0x0030;                         // sets pc to 8 multiplied by the number associated with RST (8*6)
         state->pc--;
         break;
 
@@ -2464,8 +2540,8 @@ int CPU::Emulate8080Codes(State8080 *state)
         }
         break;
 
-    case 0xFB: // EI (TODO - Special)
-        // CPU::UnimplementedInstruction(state);
+    case 0xFB: // EI - Special: enables interrupts
+        state->int_enable = 1;
         break;
 
     case 0xFC: // CM adr (CALL if minus)
@@ -2503,18 +2579,18 @@ int CPU::Emulate8080Codes(State8080 *state)
         state->mem[state->sp - 1] = (result >> 8); // store the higher bits of the addr in the higher stack addr
         state->mem[state->sp - 2] = result & 0xff; // store the lower bits of the address in the lower stack addr
         state->sp -= 2;                            // stack grows downward
-        state->pc = 8 * 7;                         // sets pc to 8 multiplied by the number associated with RST (8*7)
+        state->pc = 0x0038;                         // sets pc to 8 multiplied by the number associated with RST (8*7)
         state->pc--;
         break;
     }
     (state->pc)++;
 
     // print out the processor state, flags and registers after execution
-    printf("\tC=%d,P=%d,S=%d,Z=%d\n", state->f.cy, state->f.p,
+    /*printf("\tC=%d,P=%d,S=%d,Z=%d\n", state->f.cy, state->f.p,
            state->f.s, state->f.z);
     printf("\tA $%02x B $%02x C $%02x D $%02x E $%02x H $%02x L $%02x SP %04x\n",
            state->a, state->b, state->c, state->d,
-           state->e, state->h, state->l, state->sp);
+           state->e, state->h, state->l, state->sp);*/
     // Potentially short term return, expect failed cases will return 1?
     return 0;
 }

@@ -47,5 +47,19 @@ public:
     uint8_t FlagCalc(FlagCodes flagState);
   
     bool IsAuxFlagSet(uint16_t number);
+
+    void PerformInterrupt(State8080* state);
+
+private:
+    int interruptNumber = 1;
+
+    uint8_t     shift0          = 0;
+    uint8_t     shift1          = 0;
+    uint8_t     shift_offset    = 0;
+
+    uint8_t HandleInput(uint8_t port);
+    void    HandleOutput(uint8_t port, uint8_t value);
+
+
   
 };
