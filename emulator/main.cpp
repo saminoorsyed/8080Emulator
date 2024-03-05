@@ -9,7 +9,7 @@ using namespace std;
 using namespace std::chrono;
 namespace FileSystem = std::filesystem;
 
-#include "emulator_shell.h" 
+#include "emulator_shell.h"
 
 void ReadFileIntoMemoryAt(CPU::State8080 *state, const char *filename, uint32_t offset)
 {
@@ -17,7 +17,7 @@ void ReadFileIntoMemoryAt(CPU::State8080 *state, const char *filename, uint32_t 
     std::filesystem::path romPath = filename;
     string filepath = FileSystem::absolute(romPath).string();
     const char *rawFilePath = filepath.c_str();
-    const char* mode = "rb";
+    const char *mode = "rb";
 #ifdef _WIN32
     errno_t err = fopen_s(&f, rawFilePath, mode);
 #else
@@ -38,20 +38,20 @@ void ReadFileIntoMemoryAt(CPU::State8080 *state, const char *filename, uint32_t 
 }
 
 CPU::State8080 *Init8080(void)
-{   
+{
     // allocate initialized data for cpu state
-    CPU::State8080 *state = (CPU::State8080*)calloc(1, sizeof(CPU::State8080));
+    CPU::State8080 *state = (CPU::State8080 *)calloc(1, sizeof(CPU::State8080));
     // point state->mem toward 16k of memory
-    state->mem = (uint8_t*)malloc(0x10000); // 16K
+    state->mem = (uint8_t *)malloc(0x10000); // 16K
     return state;
 }
 
-void RenderGraphics(CPU::State8080* state)
+void RenderGraphics(CPU::State8080 *state)
 {
     milliseconds startingTime, currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
     const int frameTime = 100;
     SDL_Event event;
-    Renderer8080* vRender = new Renderer8080();
+    Renderer8080 *vRender = new Renderer8080();
     vRender->init();
     bool terminate = false;
     while (!terminate)
@@ -71,39 +71,42 @@ void RenderGraphics(CPU::State8080* state)
     vRender->destory();
 }
 
-void CollectInput(CPU::State8080* state, SDL_Event event)
+void CollectInput(CPU::State8080 *state, SDL_Event event)
 {
     PortLoader8080 portLoader;
-
-    while (SDL_WaitEvent(&event))
+    bool quit = false;
+    while (!quit)
     {
-        if (event.type == SDL_QUIT)
-            break;
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT){
+                quit = true;
+            }
 
-        // Call PortLoader function passing the CPU state and the event
-        portLoader.PortLoader(state, event);
+            // Call PortLoader function passing the CPU state and the event
+            portLoader.PortLoader(state, event);
+        }
     }
 }
-
 
 int main(int argc, char **argv)
 {
     int done = 0;
     CPU::State8080 *state = Init8080();
     // store the beginning of the memory for state
-    uint8_t* mem_start = state->mem;
+    uint8_t *mem_start = state->mem;
     // load the rom files into memory
     ReadFileIntoMemoryAt(state, "../ROM/invaders.h", 0);
     ReadFileIntoMemoryAt(state, "../ROM/invaders.g", 0x800);
     ReadFileIntoMemoryAt(state, "../ROM/invaders.f", 0x1000);
     ReadFileIntoMemoryAt(state, "../ROM/invaders.e", 0x1800);
-    // we need an instance of CPU to call the Emulator8080 codes 
+    // we need an instance of CPU to call the Emulator8080 codes
     CPU cpu_instance;
     SDL_Event event;
-    //Run Graphics on Graphics thread
+    // Run Graphics on Graphics thread
     thread RenderThread(RenderGraphics, state);
     thread InputThread(CollectInput, state, event);
-    //Run CPU on Main Thread
+    // Run CPU on Main Thread
     while (done == 0)
     {
         for (int i = 0; i < 10000; i++)
@@ -112,7 +115,6 @@ int main(int argc, char **argv)
         }
         cpu_instance.PerformInterrupt(state);
         this_thread::sleep_for(milliseconds(15));
-        
     }
     free(mem_start);
     return 0;
