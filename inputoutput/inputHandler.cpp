@@ -1,7 +1,9 @@
 #include "inputHandler.h"
 #include <iostream>
 
-void LoadPorts(CPU::State8080 *state, SDL_Event event)
+PortLoader8080::PortLoader8080(){}
+
+void PortLoader8080::PortLoader(CPU::State8080 *state, SDL_Event event)
 {
     if (event.type == SDL_KEYDOWN)
     {

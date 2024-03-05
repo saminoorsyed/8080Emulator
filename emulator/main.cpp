@@ -71,6 +71,20 @@ void RenderGraphics(CPU::State8080* state)
     vRender->destory();
 }
 
+void CollectInput(CPU::State8080* state, SDL_Event event)
+{
+    PortLoader8080 portLoader;
+
+    while (SDL_WaitEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            break;
+
+        // Call PortLoader function passing the CPU state and the event
+        portLoader.PortLoader(state, event);
+    }
+}
+
 
 int main(int argc, char **argv)
 {
@@ -85,31 +99,19 @@ int main(int argc, char **argv)
     ReadFileIntoMemoryAt(state, "../ROM/invaders.e", 0x1800);
     // we need an instance of CPU to call the Emulator8080 codes 
     CPU cpu_instance;
-
+    SDL_Event event;
     //Run Graphics on Graphics thread
     thread RenderThread(RenderGraphics, state);
-
+    thread InputThread(CollectInput, state, event);
     //Run CPU on Main Thread
     while (done == 0)
     {
         for (int i = 0; i < 10000; i++)
         {
             done = cpu_instance.Emulate8080Codes(state);
-            SDL_Event event;
-            while (SDL_PollEvent(&event))
-            {
-                if (event.type == SDL_QUIT)
-                {
-                    done = 1;
-                }
-                else
-                {
-                    LoadPorts(state, event);
-                }
-            }
         }
         cpu_instance.PerformInterrupt(state);
-        this_thread::sleep_for(milliseconds(10));
+        this_thread::sleep_for(milliseconds(15));
         
     }
     free(mem_start);
