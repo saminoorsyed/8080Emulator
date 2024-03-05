@@ -1,5 +1,4 @@
 #include "inputHandler.h"
-#include <SDL2/SDL.h>
 #include <iostream>
 
 void LoadPorts(CPU::State8080 *state, SDL_Event event)
