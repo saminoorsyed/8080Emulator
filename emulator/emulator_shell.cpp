@@ -69,6 +69,7 @@ void CPU::PerformInterrupt(State8080 *state)
 {
     if (state->int_enable)
     {
+        state->halted = false;
         uint16_t valuePC = state->pc - 1;
         uint8_t upperByte = uint8_t(valuePC >> 8);
         uint8_t lowerByte = uint8_t(valuePC - (upperByte << 8));
@@ -839,8 +840,7 @@ int CPU::Emulate8080Codes(State8080 *state)
         break;
 
     case 0x76:
-        // HLT      special
-        // FIXME;
+        state->halted = true;
         break;
 
     case 0x77:

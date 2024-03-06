@@ -107,10 +107,13 @@ int main(int argc, char **argv)
     thread RenderThread(RenderGraphics, state);
     thread InputThread(CollectInput, state, event);
     // Run CPU on Main Thread
+    int i;
     while (done == 0)
     {
-        for (int i = 0; i < 10000; i++)
+        i = 0;
+        while (i < 10000 && !state->halted)
         {
+            i++;
             done = cpu_instance.Emulate8080Codes(state);
         }
         cpu_instance.PerformInterrupt(state);
@@ -119,3 +122,31 @@ int main(int argc, char **argv)
     free(mem_start);
     return 0;
 }
+// state->halted = false;
+// auto interval = std::chrono::milliseconds(1000 / 60);
+// auto start_time = std::chrono::steady_clock::now();
+// // Run CPU on Main Thread
+// while (done == 0)
+// {
+//     if (!state->halted)
+//     {
+//         done = cpu_instance.Emulate8080Codes(state);
+//     }
+//     else
+//     {
+
+//         state->halted = false;
+//         cpu_instance.PerformInterrupt(state);
+//         start_time = std::chrono::steady_clock::now();
+//     }
+//     auto end_time = std::chrono::steady_clock::now();
+//     auto elapsed_time = end_time - start_time;
+//     if (elapsed_time > interval)
+//     {
+//         state->halted = false;
+//     }
+//     this_thread::sleep_for(milliseconds(10));
+// }
+// free(mem_start);
+// return 0;
+// }

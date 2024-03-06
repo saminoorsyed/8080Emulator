@@ -36,6 +36,7 @@ public:
         uint8_t port1;
         uint8_t port2;
         uint8_t port3;
+        bool halted;
         FlagCodes f;
     } State8080;
 
