@@ -110,7 +110,7 @@ void CPU::HandleInput(State8080 *state, uint8_t port)
     }
 }
 
-void CPU::HandleOutput(uint8_t port, uint8_t value)
+void CPU::HandleOutput(uint8_t port, uint8_t value, State8080 *state)
 {
     switch (port)
     {
@@ -118,16 +118,50 @@ void CPU::HandleOutput(uint8_t port, uint8_t value)
         shift_offset = value & 0x7;
         break;
     case 3:
-        // out_port3 = value;
+        state->out_port3 = value;
         break;
     case 4:
         shift0 = shift1;
         shift1 = value;
         break;
     case 5:
-        // out_port5 = value;
+        state->out_port5 = value;
         break;
     }
+}
+
+void CPU::AudioBootup(){
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
+}
+
+void CPU::AudioTearDown() {
+    //Mix_FreeChunk to get rid of sound effect
+    Mix_CloseAudio();
+}
+
+
+void CPU::PlayAudio(State8080 *state)
+{
+    if(state->out_port3 != state->out_port3_prev){
+        //UFO sound
+
+        //player shooting
+        if((state->out_port3 & 0x2) && !(state->out_port3_prev & 0x2)){
+            Mix_PlayChannel(-1, Mix_LoadWAV("../sounds/1.wav"), 0);
+        }
+
+        //player dying
+        if((state->out_port3 & 0x4) && !(state->out_port3_prev & 0x4)){
+            Mix_PlayChannel(-1, Mix_LoadWAV("../sounds/2.wav"), 0);
+        }
+
+        //Invader dying
+        if((state->out_port3 & 0x8) && !(state->out_port3_prev & 0x8)){
+            Mix_PlayChannel(-1, Mix_LoadWAV("../sounds/3.wav"), 0);
+        }
+        state->out_port3_prev = state->out_port3;
+    }
+
 }
 
 // Function for emulating 8080 opcodes, has case for each of our opcodes
@@ -2118,7 +2152,8 @@ int CPU::Emulate8080Codes(State8080 *state)
     case 0xD3: // OUT d8
         // this is unimplemented as it deals with sending data to external hardware
         // for now I'll skip over the operation's data
-        HandleOutput(opcode[1], state->a);
+        HandleOutput(opcode[1], state->a, state);
+        PlayAudio(state);
         state->pc++;
         break;
 

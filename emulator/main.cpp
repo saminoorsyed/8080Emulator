@@ -108,6 +108,7 @@ int main(int argc, char **argv)
     thread InputThread(CollectInput, state, event);
     // Run CPU on Main Thread
     int i;
+    CPU::AudioBootup();
     while (done == 0)
     {
         i = 0;
@@ -119,6 +120,7 @@ int main(int argc, char **argv)
         cpu_instance.PerformInterrupt(state);
         this_thread::sleep_for(milliseconds(15));
     }
+    CPU::AudioTearDown();
     free(mem_start);
     return 0;
 }
