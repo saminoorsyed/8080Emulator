@@ -144,24 +144,51 @@ void CPU::PlayAudio(State8080 *state)
 {
     if(state->out_port3 != state->out_port3_prev){
         //UFO sound
+        if((state->out_port3 & 0x1) && !(state->out_port3_prev & 0x1)) {
+            Mix_PlayChannel(1, Mix_LoadWAV("../sounds/0.wav"), -1);
+        }
 
+        else if(!(state->out_port3 & 0x1) && (state->out_port3_prev & 0x1)){
+            Mix_HaltChannel(1);
+        }
         //player shooting
         if((state->out_port3 & 0x2) && !(state->out_port3_prev & 0x2)){
-            Mix_PlayChannel(-1, Mix_LoadWAV("../sounds/1.wav"), 0);
+            Mix_PlayChannel(2, Mix_LoadWAV("../sounds/1.wav"), 0);
         }
 
         //player dying
         if((state->out_port3 & 0x4) && !(state->out_port3_prev & 0x4)){
-            Mix_PlayChannel(-1, Mix_LoadWAV("../sounds/2.wav"), 0);
+            Mix_PlayChannel(3, Mix_LoadWAV("../sounds/2.wav"), 0);
         }
 
         //Invader dying
         if((state->out_port3 & 0x8) && !(state->out_port3_prev & 0x8)){
-            Mix_PlayChannel(-1, Mix_LoadWAV("../sounds/3.wav"), 0);
+            Mix_PlayChannel(4, Mix_LoadWAV("../sounds/3.wav"), 0);
         }
         state->out_port3_prev = state->out_port3;
     }
 
+    if(state->out_port5 != state->out_port5_prev){
+        //Invader beepboop #1
+        if((state->out_port5 & 0x1) && !(state->out_port5_prev & 0x1)){
+            Mix_PlayChannel(5, Mix_LoadWAV("../sounds/4.wav"), 0);
+        }
+
+        //Invader beepboop #2
+        if((state->out_port5 & 0x2) && !(state->out_port5_prev & 0x2)){
+            Mix_PlayChannel(6, Mix_LoadWAV("../sounds/5.wav"), 0);
+        }
+
+        //Invader beepboop #3
+        if((state->out_port5 & 0x4) && !(state->out_port5_prev & 0x4)){
+            Mix_PlayChannel(7, Mix_LoadWAV("../sounds/6.wav"), 0);
+        }
+
+        //Invader beepboop #4 (?)
+        if((state->out_port5 & 0x8) && !(state->out_port5_prev & 0x8)){
+            Mix_PlayChannel(8, Mix_LoadWAV("../sounds/7.wav"), 0);
+        }
+    }
 }
 
 // Function for emulating 8080 opcodes, has case for each of our opcodes
