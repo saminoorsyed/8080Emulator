@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <SDL_mixer.h>
 
 class CPU {
 
@@ -33,6 +34,13 @@ public:
         uint16_t pc;
         uint8_t *mem;
         uint8_t int_enable;
+        uint8_t port1;
+        uint8_t port2;
+        uint8_t out_port3;
+        uint8_t out_port5;
+        uint8_t out_port3_prev;
+        uint8_t out_port5_prev;
+        bool halted;
         FlagCodes f;
     } State8080;
 
@@ -50,6 +58,10 @@ public:
 
     void PerformInterrupt(State8080* state);
 
+    static void AudioBootup();
+
+    static void AudioTearDown();
+
 private:
     int interruptNumber = 1;
 
@@ -57,8 +69,9 @@ private:
     uint8_t     shift1          = 0;
     uint8_t     shift_offset    = 0;
 
-    uint8_t HandleInput(uint8_t port);
-    void    HandleOutput(uint8_t port, uint8_t value);
+    void HandleInput(State8080* state, uint8_t port);
+    void HandleOutput(uint8_t port, uint8_t value, State8080 *state);
+    void PlayAudio(State8080 *state);
 
 
   
