@@ -1,15 +1,17 @@
 #include <fstream>
 #include <chrono>
-#include "../renderer8080/renderer.h"
 #include <filesystem>
 #include <thread>
+#include <atomic>
+#include "emulator_shell.h"
 #include "../inputoutput/inputHandler.h"
+#include "../renderer8080/renderer.h"
 
 using namespace std;
 using namespace std::chrono;
 namespace FileSystem = std::filesystem;
+std::atomic<bool> quit{false};
 
-#include "emulator_shell.h"
 
 void ReadFileIntoMemoryAt(CPU::State8080 *state, const char *filename, uint32_t offset)
 {
@@ -46,45 +48,16 @@ CPU::State8080 *Init8080(void)
     return state;
 }
 
-void RenderGraphics(CPU::State8080 *state)
+void RenderGraphics(CPU::State8080 *state, milliseconds startingTime, milliseconds currentTime, Renderer8080 *vRender)
 {
-    milliseconds startingTime, currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
     const int frameTime = 100;
-    SDL_Event event;
-    Renderer8080 *vRender = new Renderer8080();
-    vRender->init();
-    bool terminate = false;
-    while (!terminate)
+    while (!quit)
     {
         currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-                terminate = true;
-        }
         if (currentTime.count() - startingTime.count() > frameTime)
         {
             vRender->RenderPixels(state);
             startingTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
-        }
-    }
-    vRender->destory();
-}
-
-void CollectInput(CPU::State8080 *state, SDL_Event event)
-{
-    PortLoader8080 portLoader;
-    bool quit = false;
-    while (!quit)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT){
-                quit = true;
-            }
-
-            // Call PortLoader function passing the CPU state and the event
-            portLoader.PortLoader(state, event);
         }
     }
 }
@@ -93,6 +66,9 @@ int main(int argc, char **argv)
 {
     int done = 0;
     CPU::State8080 *state = Init8080();
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Event event;
+    PortLoader8080 portLoader;
     // store the beginning of the memory for state
     uint8_t *mem_start = state->mem;
     // load the rom files into memory
@@ -102,13 +78,14 @@ int main(int argc, char **argv)
     ReadFileIntoMemoryAt(state, "../ROM/invaders.e", 0x1800);
     // we need an instance of CPU to call the Emulator8080 codes
     CPU cpu_instance;
-    SDL_Event event;
-    // Run Graphics on Graphics thread
-    thread RenderThread(RenderGraphics, state);
-    thread InputThread(CollectInput, state, event);
+    // Run rendering on RenderThread
+    milliseconds startingTime, currentTime = duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch());
+    Renderer8080 *vRender = new Renderer8080();
+    vRender->init();
+    thread RenderThread(RenderGraphics, state, startingTime, currentTime, vRender);
     // Run CPU on Main Thread
-    int i;
     CPU::AudioBootup();
+    int i;
     while (done == 0)
     {
         i = 0;
@@ -118,12 +95,25 @@ int main(int argc, char **argv)
             done = cpu_instance.Emulate8080Codes(state);
         }
         cpu_instance.PerformInterrupt(state);
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                done = 1;
+                quit = true;
+            }
+            portLoader.PortLoader(state, event);
+        }
         this_thread::sleep_for(milliseconds(15));
     }
+    RenderThread.join();
     CPU::AudioTearDown();
+    vRender->destory();
+    SDL_Quit();
     free(mem_start);
     return 0;
 }
+
 // state->halted = false;
 // auto interval = std::chrono::milliseconds(1000 / 60);
 // auto start_time = std::chrono::steady_clock::now();
@@ -148,7 +138,6 @@ int main(int argc, char **argv)
 //         state->halted = false;
 //     }
 //     this_thread::sleep_for(milliseconds(10));
-// }
 // free(mem_start);
 // return 0;
 // }
