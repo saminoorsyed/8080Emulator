@@ -7,7 +7,7 @@ void PortLoader8080::PortLoader(CPU::State8080 *state, SDL_Event event)
 {
     if (event.type == SDL_KEYDOWN)
     {
-        std::cout << "Key Down: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
+        // std::cout << "Key Down: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
         switch (event.key.keysym.sym)
         {
         case SDLK_c: // coin
@@ -45,7 +45,7 @@ void PortLoader8080::PortLoader(CPU::State8080 *state, SDL_Event event)
     }
     else if (event.type == SDL_KEYUP)
     {
-        std::cout << "Key Up: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
+        // std::cout << "Key Up: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
         switch (event.key.keysym.sym)
         {
         case SDLK_c: // coin
