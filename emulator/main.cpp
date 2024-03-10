@@ -72,10 +72,10 @@ int main(int argc, char **argv)
     // store the beginning of the memory for state
     uint8_t *mem_start = state->mem;
     // load the rom files into memory
-    ReadFileIntoMemoryAt(state, "../ROM/invaders.h", 0);
-    ReadFileIntoMemoryAt(state, "../ROM/invaders.g", 0x800);
-    ReadFileIntoMemoryAt(state, "../ROM/invaders.f", 0x1000);
-    ReadFileIntoMemoryAt(state, "../ROM/invaders.e", 0x1800);
+    ReadFileIntoMemoryAt(state, "ROM/invaders.h", 0);
+    ReadFileIntoMemoryAt(state, "ROM/invaders.g", 0x800);
+    ReadFileIntoMemoryAt(state, "ROM/invaders.f", 0x1000);
+    ReadFileIntoMemoryAt(state, "ROM/invaders.e", 0x1800);
     // we need an instance of CPU to call the Emulator8080 codes
     CPU cpu_instance;
     // Run rendering on RenderThread
