@@ -6,34 +6,34 @@ Description: This Repository is focused on building an Emulator for the 8080 pro
 
 The following will be the basic order in which our team tackles building our project:
 
--Set up environment and ensure team members can successfully compile code with requisite basic libraries
--Build a disassembler for the Space Invaders ROM.
-    -Based on 8080 opcode
-    -Document disassembled code for human readability
--Build an Emulator File for the 8080 Processor.
-    -Write emulator shell
-    -Implement code for basic logic groups
-    -Implement instructions required for 8080 assembly code
-    -Debug, debug, debug
--Build an emulator file for the hardware of the arcade processor.
-    -Visual interrupts
-    -Processor timing
-    -Audio outputs
-    -Keyboard inputs
-    -Debug
--Build a file for interpreting i/o from our computers
-    -Keyboard inputs
-    -Audio outputs
-    -Platform-specific instructions/code
-    -Debug
--Build a GUI to interact with the Emulator
-    -Start game option
-    -Exit game option
--(Optional) Add additional games for emulation
-    -Implement additional assembly instructions
-    -Add game-selection for GUI
-    -Debug and ensure that hardware i/o is consistent
--Play the Game
+- Set up environment and ensure team members can successfully compile code with requisite basic libraries
+- Build a disassembler for the Space Invaders ROM.
+    - Based on 8080 opcode
+    - Document disassembled code for human readability
+- Build an Emulator File for the 8080 Processor.
+    - Write emulator shell
+    - Implement code for basic logic groups
+    - Implement instructions required for 8080 assembly code
+    - Debug, debug, debug
+- Build an emulator file for the hardware of the arcade processor.
+    - Visual interrupts
+    - Processor timing
+    - Audio outputs
+    - Keyboard inputs
+    - Debug
+- Build a file for interpreting i/o from our computers
+    - Keyboard inputs
+    - Audio outputs
+    - Platform-specific instructions/code
+    - Debug
+- Build a GUI to interact with the Emulator
+    - Start game option
+    - Exit game option
+- (Optional) Add additional games for emulation
+    - Implement additional assembly instructions
+    - Add game-selection for GUI
+    - Debug and ensure that hardware i/o is consistent
+- Play the Game
 
 # INSTALLATION GUIDE
 Intel8080 Emulator For Space Invaders
@@ -126,11 +126,3 @@ G
 
 References
 Simple DirectMedia Layer. Available: https://www.libsdl.org/ [Accessed: Jan-Mar, 2024].
-
-
-
-## Build a file for interpreting i/o from our computers
-
-
-## Build a GUI to interact with the Emulator
-
