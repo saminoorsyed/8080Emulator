@@ -51,6 +51,19 @@ Double click the space_invaders.exe and have fun! See appendix A for controls
 
 To quit the game, simply click the X in the top right corner of the game window.
 
+## Obtaining ROM files
+Before you can play you should have the actual Space Invaders rom in form of four distinct files named:
+invaders
+invaders.e
+invaders.f
+invaders.g
+invaders.h
+
+place the Rom files in a folder called `ROM` in the root directory
+
+`The ROM files are copyrighted material and you aren't supposed to posses a copy of it without an explicit permission from the copyright owners.`
+
+
 ## Linux
 
 To run and play the game, clone the repository as above, navigate to the repository’s root and type ./space_invaders_linux into the terminal. This executable is statically compiled, so as long as it is run from the correct file location it should run. A note on this version of the game: the sounds are currently disabled, but it is otherwise playable.
